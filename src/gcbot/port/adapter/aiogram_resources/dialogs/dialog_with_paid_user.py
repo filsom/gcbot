@@ -16,15 +16,14 @@ async def get_button_status(dialog_manager: DialogManager, **kwargs):
     }
 
 
-@inject
-async def on_сlick_workout_section(
-    callback: t.CallbackQuery,
-    button,
+async def on_click_section(
+    user_id: int,
+    group_id: int,
     dialog_manager: DialogManager,
-    query_service: FromDishka[UserQueryService]
+    query_service: UserQueryService
 ):
     query_result = await query_service \
-        .query_user_section(callback.from_user.id, Group.WORKOUT)
+        .query_user_section(user_id, group_id)
     if query_result.get("dialog_state", None) is not None:
         await dialog_manager.start(
             query_result.get("dialog_state"),
@@ -35,6 +34,21 @@ async def on_сlick_workout_section(
             query_result["button_status"]
         )
         await dialog_manager.next()
+
+
+@inject
+async def on_сlick_workout_section(
+    callback: t.CallbackQuery,
+    button,
+    dialog_manager: DialogManager,
+    query_service: FromDishka[UserQueryService]
+):
+    await on_click_section(
+        callback.from_user.id,
+        Group.WORKOUT,
+        dialog_manager,
+        query_service
+    )
 
 
 @inject
@@ -44,19 +58,12 @@ async def on_сlick_food_section(
     dialog_manager: DialogManager,
     query_service: FromDishka[UserQueryService]
 ):
-    query_result = await query_service \
-        .query_user_section(callback.from_user.id, Group.FOOD)
-    if query_result.get("dialog_state", None) is not None:
-        await dialog_manager.start(
-            query_result.get("dialog_state"),
-            data={"user_kcal": query_result["norma_kcal"]},
-            show_mode=ShowMode.EDIT,
-        )
-    else:
-        dialog_manager.dialog_data.update(
-            query_result["button_status"]
-        )
-        await dialog_manager.next()
+    await on_click_section(
+        callback.from_user.id,
+        Group.FOOD,
+        dialog_manager,
+        query_service
+    )
         
 
 paid_starting_dialog = Dialog(

@@ -27,6 +27,10 @@ class WorkoutDialog(StatesGroup):
     view = State()
 
 
+class FoodDialog(StatesGroup):
+    start = State()
+
+
 class InputNormaDayDialog(StatesGroup):
     start = State()
     protein = State()
@@ -42,10 +46,6 @@ class CalculateNormaDayDialog(StatesGroup):
     activity = State()
     target = State()
     end = State()
-
-
-class FoodDialog(StatesGroup):
-    start = State()
 
 
 class WorkoutDialog(StatesGroup):
