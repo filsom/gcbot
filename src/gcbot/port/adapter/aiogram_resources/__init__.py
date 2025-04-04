@@ -5,7 +5,7 @@ from .dialogs.dialog_with_paid_user import paid_starting_dialog
 from .dialogs.dialogs_food.dialog_with_food import food_dialog
 from .dialogs.dialogs_food.dialog_with_input_norma_day import input_norma_day_dialog
 from .dialogs.dialogs_food.dialog_with_calculate_norma_day import calculate_norma_day_dialog
-
+from .dialogs.dialog_with_workout import workout_dialog
 
 
 starting_router.include_router(anon_starting_dialog)
@@ -14,3 +14,4 @@ starting_router.include_router(paid_starting_dialog)
 starting_router.include_router(food_dialog)
 starting_router.include_router(input_norma_day_dialog)
 starting_router.include_router(calculate_norma_day_dialog)
+starting_router.include_router(workout_dialog)

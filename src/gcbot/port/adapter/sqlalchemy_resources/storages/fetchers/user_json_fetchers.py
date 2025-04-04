@@ -15,11 +15,8 @@ class UserJsonFetcher:
                     "user_id", users_table.c.user_id,
                     "email", users_table.c.email,
                     "norma_kcal", users_table.c.norma_kcal,
-                    "groups", sa.case(
-                        (groups_table.c.group_id == None, []),
-                        else_=sa.func.json_agg(groups_table.c.group_id)
-                    )                    
-                )
+                    "groups", sa.func.json_agg(groups_table.c.group_id)
+                )                 
             )
             .select_from(users_table)
             .outerjoin(
@@ -29,7 +26,6 @@ class UserJsonFetcher:
             .group_by(
                 users_table.c.user_id, 
                 users_table.c.email, 
-                groups_table.c.group_id
             )
             .where(users_table.c.user_id == user_id)
         )

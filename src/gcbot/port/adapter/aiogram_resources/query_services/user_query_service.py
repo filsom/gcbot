@@ -63,10 +63,11 @@ class UserQueryService:
     async def query_user_section(self, user_id: int, group_id: int) -> dict:
         user_data = await self.user_fetcher \
             .fetch_user_and_groups_with_id(user_id)
+        print(user_data)
         if group_id in user_data["groups"] or Group.ADMIN in user_data["groups"]:
             if group_id == Group.FOOD:
                 dialog_state = FoodDialog.start
-            else:
+            elif group_id == Group.WORKOUT:
                 dialog_state = WorkoutDialog.start
             user_data.update({"dialog_state": dialog_state})
         else:

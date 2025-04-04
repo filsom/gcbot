@@ -11,5 +11,5 @@ class Config:
 def load_config():
     return Config(
         db_url=os.environ.get("DB_URL"),
-        bot_token=os.getenv("BOT_TOKEN")
+        bot_token=os.environ.get("BOT_TOKEN")
     )

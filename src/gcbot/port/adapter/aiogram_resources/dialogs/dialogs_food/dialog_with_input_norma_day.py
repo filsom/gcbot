@@ -8,7 +8,7 @@ from dishka.integrations.aiogram_dialog import inject
 
 from gcbot.application.user_service import UserService
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import InputNormaDayDialog
-from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_food.widgets import (
+from gcbot.port.adapter.aiogram_resources.dialogs.widgets import (
     DailyNormResultWindow, 
     NormaDayTextInput,
     on_error_inpute_value

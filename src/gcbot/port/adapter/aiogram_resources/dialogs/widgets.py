@@ -37,6 +37,14 @@ async def on_click_back_main(
     )
 
 
+def BackMain():
+    return kbd.Button(
+        text.Const("⬅️ На главную"), 
+        id="back_main", 
+        on_click=on_click_back_main
+    )
+
+
 def NormaDayTextInput(id: str) -> input.TextInput:
     return input.TextInput(
         id,
@@ -72,11 +80,7 @@ def DailyNormResultWindow(state, getter) -> Window:
             id="day_menu",
             on_click=on_click_day_meny
         ),
-        kbd.Button(
-            text.Const("⬅️ На главную"), 
-            id="back_main_from_input_norma_day", 
-            on_click=on_click_back_main
-        ),
+        BackMain(),
         state=state,
         getter=getter
     )

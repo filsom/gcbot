@@ -10,7 +10,7 @@ from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import (
     InputNormaDayDialog, 
     PaidStartingDialog
 )
-from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_food.widgets import on_click_day_meny
+from gcbot.port.adapter.aiogram_resources.dialogs.widgets import on_click_day_meny
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_json_fetchers import UserJsonFetcher
 
 

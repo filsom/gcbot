@@ -1,4 +1,5 @@
 from decimal import Decimal as D
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncConnection
 
@@ -7,6 +8,7 @@ from gcbot.domain.model.day_menu import adjust_recipes, present_the_menu
 from gcbot.domain.model.norma_day import calculate_daily_norm
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_storage import RecipeStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_storage import UserStorage
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_storage import WorkoutStorage
 
 
 class UserService:
@@ -14,11 +16,26 @@ class UserService:
         self, 
         connection: AsyncConnection,
         user_storage: UserStorage,
-        recipe_storage: RecipeStorage
+        recipe_storage: RecipeStorage,
+        workout_storage: WorkoutStorage
     ):
         self.connection = connection
         self.user_storage = user_storage
         self.recipe_storage = recipe_storage
+        self.workout_storage = workout_storage
+
+    async def add_workout_to_favorites(self, user_id: int, workout_id: UUID) -> None:
+        async with self.connection.begin():
+            
+            await self.workout_storage \
+                .put_like(user_id, workout_id)
+            await self.connection.commit()
+
+    async def delete_workout_from_favorites(self, user_id: int, workout_id: UUID) -> None:
+        async with self.connection.begin():
+            await self.workout_storage \
+                .delete_liked(user_id, workout_id)
+            await self.connection.commit()
 
     async def make_day_menu(self, command: cmd.MakeMenuCommand) -> dict:
         async with self.connection.begin():

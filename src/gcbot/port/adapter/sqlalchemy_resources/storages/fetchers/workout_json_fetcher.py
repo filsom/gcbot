@@ -17,7 +17,7 @@ class WorkoutJsonFetcher:
     def __init__(self, connection: AsyncConnection):
         self.connection = connection
 
-    async def fetch_like_name_categories(self, user_id: int):
+    async def fetch_favorites_categories_names(self, user_id: int):
         sub_query = (
             sa.select(workouts_table.c.category_id)
             .select_from(workouts_table)
@@ -41,7 +41,7 @@ class WorkoutJsonFetcher:
             name_categories.append(row)
         return {"categories": name_categories}
     
-    async def fetch_name_all_categories(self):
+    async def fetch_all_categories_names(self):
         query = (
             sa.select(
                 categories_table.c.name, 
@@ -72,7 +72,7 @@ class WorkoutJsonFetcher:
         result = (await self.connection.execute(query)).scalar()
         return result
     
-    async def fetch_like_workout_with_category_id(
+    async def fetch_favorite_workout_with_category_id(
         self, 
         category_id: UUID, 
         user_id: int, 
@@ -82,8 +82,10 @@ class WorkoutJsonFetcher:
             .order_by(sa.func.random())
         )
         result = (await self.connection.execute(query)).scalar()
-        result["is_like"] = False
-        result["is_delete"] = True
+        if result is None:
+            return None
+        result["button_like"] = False
+        result["button_delete"] = True
         return result
     
     async def fetch_random_workout_with_category_id(
@@ -96,11 +98,14 @@ class WorkoutJsonFetcher:
             .order_by(sa.func.random())
         )
         result = (await self.connection.execute(query)).scalar()
-        result["is_like"] = True
-        result["is_delete"] = False
+        if result is None:
+            return None
+        result["button_like"] = True
+        result["button_delete"] = False
         return result
     
     def _select_workout(self, category_id: UUID, user_id: int, isouter=False):
+        print(user_id, "r")
         liked = (
             sa.select(
                 like_workouts_table.c.workout_id.label("workout_id")
@@ -112,8 +117,8 @@ class WorkoutJsonFetcher:
             self._select_json_workout()
             .select_from(workouts_table)
             .join(
-                like_workouts_table, 
-                like_workouts_table.c.workout_id == workouts_table.c.workout_id
+                workouts_medias_table, 
+                workouts_medias_table.c.workout_id == workouts_table.c.workout_id
             )
             .join(
                 liked, 
@@ -127,14 +132,14 @@ class WorkoutJsonFetcher:
             .limit(1)
         )
         if isouter is True:
-            query = query.where(liked.c.training_id == None)
+            query = query.where(liked.c.workout_id == None)
         return query
 
     def _select_json_workout(self) -> sa.Select[tuple[Any]]:
         select = (
             sa.select(
                 sa.func.json_build_object(
-                    "training_id", workouts_table.c.workout_id,
+                    "workout_id", workouts_table.c.workout_id,
                     "media", sa.func.json_agg(
                         aggregate_order_by(
                             workouts_medias_table.c.file_id, 
