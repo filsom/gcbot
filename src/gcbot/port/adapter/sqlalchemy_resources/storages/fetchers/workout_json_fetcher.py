@@ -39,7 +39,13 @@ class WorkoutJsonFetcher:
         name_categories = []
         for row in rows:
             name_categories.append(row)
-        return {"categories": name_categories}
+        text = None
+        if not name_categories:
+            text = "Избранные тренировки отсутсвуют 🤷🏻"
+        return {
+            "categories": name_categories,
+            "text": text
+        }
     
     async def fetch_all_categories_names(self):
         query = (

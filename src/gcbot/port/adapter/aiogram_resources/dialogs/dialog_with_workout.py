@@ -164,7 +164,10 @@ workout_dialog = Dialog(
         state=WorkoutDialog.start
     ),
     Window(
-        text.Const("Выберите категорию 👇🏻"),
+        text.Multi(
+            text.Const("Выберите категорию 👇🏻", when=~F["text"]),
+            text.Format("{text}", when=F["text"])
+        ),
         kbd.Column(
             kbd.Select(
                 id="selected_categories",
