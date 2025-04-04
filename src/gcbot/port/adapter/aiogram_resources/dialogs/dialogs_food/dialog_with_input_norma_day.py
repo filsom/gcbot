@@ -1,3 +1,5 @@
+from decimal import Decimal as D
+
 from aiogram import types as t
 from aiogram_dialog import Dialog, DialogManager, Window
 from aiogram_dialog.widgets import text, input
@@ -33,7 +35,7 @@ async def input_last_value(
 ):
     await service.input_norma(
         message.from_user.id, 
-        dialog_manager.find("input_kcal").get_value()
+        D(dialog_manager.find("input_kcal").get_value())
     )
     await dialog_manager.next()
 

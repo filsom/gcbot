@@ -56,7 +56,7 @@ class UserService:
                 )
             return norma_day.asdict()
 
-    async def input_norma(self, user_id: int, norma_kcal: str):
+    async def input_norma(self, user_id: int, norma_kcal: D):
         async with self.connection.begin():
             await self.user_storage \
                 .update_user({"norma_kcal": norma_kcal}, user_id)
