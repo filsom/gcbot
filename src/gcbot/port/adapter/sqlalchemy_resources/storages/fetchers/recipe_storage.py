@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncConnection
 
