@@ -28,6 +28,7 @@ async def on_click_section(
         await dialog_manager.start(
             query_result.get("dialog_state"),
             show_mode=ShowMode.EDIT,
+            data={"user_id": query_result["user_id"]}
         )
     else:
         dialog_manager.dialog_data.update(

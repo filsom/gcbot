@@ -1,10 +1,12 @@
 from enum import StrEnum, auto
 from aiogram.fsm.state import State
 
+from gcbot.domain.model.day_menu import TypeMeal
 from gcbot.domain.model.group import Group
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import (
     AdminStartingDialog, 
     AnonStartingDialog,
+    DayMenuDialog,
     FoodDialog, 
     FreeStartingDialog, 
     PaidStartingDialog,
@@ -80,4 +82,22 @@ class UserQueryService:
                     "button_food": True
                 })
             user_data.update({"button_status": button_status})
+        return user_data
+    
+    async def query_day_menu(self, user_id: int) -> dict:
+        user_data = await self.user_fetcher \
+            .fetch_user_and_groups_with_id(user_id)
+        user_data.setdefault("data", {})
+        user_data["data"].update({
+            "type_meal": [
+                TypeMeal.BREAKFAST,
+                TypeMeal.LUNCH,
+                TypeMeal.DINNER,
+                TypeMeal.SNACK
+            ],
+            "recipes": {},
+            "dirty_photos": [],
+            "narma_kcal": user_data.get("narma_kcal")
+        })
+        user_data.update({"dialog_state": DayMenuDialog.start})
         return user_data

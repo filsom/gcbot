@@ -10,7 +10,7 @@ users_table = sa.Table(
     metadata,
     sa.Column('user_id', sa.BigInteger, primary_key=True, nullable=False),
     sa.Column('email', sa.String, unique=True, nullable=False),
-    sa.Column('norma_kkal', sa.DECIMAL(20, 0), nullable=True),
+    sa.Column('norma_kcal', sa.DECIMAL(20, 0), nullable=True),
 )
 
 

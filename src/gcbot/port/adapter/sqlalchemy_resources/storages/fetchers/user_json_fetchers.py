@@ -14,7 +14,7 @@ class UserJsonFetcher:
                 sa.func.json_build_object(
                     "user_id", users_table.c.user_id,
                     "email", users_table.c.email,
-                    "norma_kcal", users_table.c.norma_kkal,
+                    "norma_kcal", users_table.c.norma_kcal,
                     "groups", sa.case(
                         (groups_table.c.group_id == None, []),
                         else_=sa.func.json_agg(groups_table.c.group_id)

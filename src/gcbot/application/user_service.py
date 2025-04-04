@@ -49,9 +49,15 @@ class UserService:
                 command.coefficient,
                 command.target_procent
             )
-            return norma_day.repr()
+            await self.user_storage \
+                .update_user(
+                    {"norma_kcal": norma_day.kcal}, 
+                    command.user_id
+                )
+            return norma_day.asdict()
 
     async def input_norma(self, user_id: int, norma_kcal: str):
         async with self.connection.begin():
-            await self.user_storage.update_user({"norma_kcal": norma_kcal}, user_id)
+            await self.user_storage \
+                .update_user({"norma_kcal": norma_kcal}, user_id)
             await self.connection.commit()

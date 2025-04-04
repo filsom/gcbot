@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from decimal import Decimal as D
 
 
@@ -23,6 +23,15 @@ class NormaDay:
 
     def repr(self) -> str:
         return f"Ккал - {self.kcal}\n{self.macros.repr()}"
+
+    def asdict(self) -> dict:
+        norma_day = {}
+        norma_day.setdefault("norma_day", {})
+        norma_day["norma_day"].update({"kcal": str(self.kcal)})
+        macros = asdict(self.macros)
+        for key in macros.keys():
+            norma_day["norma_day"].update({key: str(macros[key])})
+        return norma_day
     
 
 def calculate_daily_norm(
