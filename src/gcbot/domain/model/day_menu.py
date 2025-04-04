@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from decimal import Decimal as D
 
 
-
 class TypeMeal(object):
     BREAKFAST = 1
     LUNCH = 2
@@ -64,11 +63,11 @@ class Recipe:
         }
         text = ""
         for ingredient in self.ingredients:
-            text += f"- {ingredient.name.title()} {ingredient.value}{ingredient.unit}\n"
+            text += f"- {ingredient.name.title()} <b>{ingredient.value}{ingredient.unit}</b>\n"
         return (
-            f"Прием пищи: {TRANSlATION_MAP.get(self.type_meal)}\n"
-            f"Название рецепта: {self.name.title()}\n"
-            f"Ингредиенты:\n{text}\n"
+            f"<b>Прием пищи:</b> {TRANSlATION_MAP.get(self.type_meal)}\n"
+            f"<b>Название рецепта:</b> {self.name.title()}\n\n"
+            f"<b>Ингредиенты:</b>:\n{text}\n"
         )
     
     def full_repr(self) -> str:
@@ -120,7 +119,7 @@ def parse_recipe(data: dict[str, str]):
     }
     return Recipe(
         data["id"],
-        data["name"].strip().title(),
+        data["name"].strip()[0].title(),
         data["recipe"].strip(),
         data["photo"],
         data["kkal"],

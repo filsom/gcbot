@@ -60,3 +60,26 @@ categories_table = sa.Table(
     sa.Column('category_id', sa.UUID, primary_key=True, default=uuid4, nullable=False),
     sa.Column('name', sa.String(30), nullable=False),
 )
+
+
+recipes_table = sa.Table(
+    'recipes',
+    metadata,
+    sa.Column('recipe_id', sa.BigInteger, primary_key=True, nullable=False),
+    sa.Column('name', sa.String, nullable=False),
+    sa.Column('text', sa.String, nullable=False),
+    sa.Column('file_id', sa.String, nullable=False),
+    sa.Column('amount_kcal', sa.DECIMAL(20, 0), nullable=False),
+    sa.Column('type_meal', sa.Integer, nullable=False),
+)
+
+
+ingredients_table = sa.Table(
+    'ingredients',
+    metadata,
+    sa.Column('oid', sa.BigInteger, primary_key=True, autoincrement=True, nullable=False),
+    sa.Column('recipe_id', sa.ForeignKey('recipes.recipe_id'), nullable=False),
+    sa.Column('name', sa.String(500), nullable=False),
+    sa.Column('value', sa.DECIMAL(20, 0), nullable=False),
+    sa.Column('unit', sa.String, nullable=False),
+)

@@ -28,14 +28,14 @@ class WorkoutStorage:
         await self.connection.execute(insert_stmt)
 
     async def delete_liked(self, user_id: int, workout_id: UUID):
-        insert_stmt = (
+        delete_stmt = (
             sa.delete(like_workouts_table)
             .where(sa.and_(
                 like_workouts_table.c.user_id == user_id,
                 like_workouts_table.c.workout_id == workout_id
             ))
         )
-        await self.connection.execute(insert_stmt)
+        await self.connection.execute(delete_stmt)
 
     async def add_training(
         self,

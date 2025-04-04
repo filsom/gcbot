@@ -1,8 +1,6 @@
-from enum import StrEnum, auto
 from aiogram.fsm.state import State
 
 from gcbot.domain.model.day_menu import TypeMeal
-from gcbot.domain.model.group import Group
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import (
     AdminStartingDialog, 
     AnonStartingDialog,
@@ -12,18 +10,27 @@ from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import (
     PaidStartingDialog,
     WorkoutDialog
 )
-from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_json_fetchers import UserJsonFetcher
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_json_fetcher import RecipeJsonFetcher
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_json_fetcher import UserJsonFetcher
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_json_fetcher import WorkoutJsonFetcher
+
+
+class Group(object):
+    ADMIN = 1
+    WORKOUT = 2315673
+    FOOD = 3088338
 
 
 class UserQueryService:
     def __init__(
         self, 
         user_fetcher: UserJsonFetcher,
-        workout_fetcher: WorkoutJsonFetcher
+        workout_fetcher: WorkoutJsonFetcher,
+        recipe_fetcher: RecipeJsonFetcher
     ) -> None:
         self.user_fetcher = user_fetcher
         self.workout_fetcher = workout_fetcher
+        self.recipe_fetcher = recipe_fetcher
 
     async def query_command_start(self, user_id: int) -> State:
         user_data = await self.user_fetcher \
@@ -98,7 +105,11 @@ class UserQueryService:
             ],
             "recipes": {},
             "dirty_photos": [],
-            "narma_kcal": user_data.get("narma_kcal")
+            "norma_kcal": str(user_data.get("norma_kcal"))
         })
         user_data.update({"dialog_state": DayMenuDialog.start})
         return user_data
+    
+    async def query_recipe_with_type_meal(self, type_meal: str) -> dict:
+        return await self.recipe_fetcher \
+            .fetch_partial_recipe_with_type_meal(type_meal)

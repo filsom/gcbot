@@ -4,9 +4,8 @@ from aiogram_dialog.widgets import text, kbd
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 
-from gcbot.domain.model.group import Group
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import PaidStartingDialog
-from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
+from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import Group, UserQueryService
 
 
 async def get_button_status(dialog_manager: DialogManager, **kwargs):         

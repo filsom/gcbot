@@ -11,7 +11,7 @@ from aiogram_dialog import setup_dialogs
 from dishka import make_async_container
 from dishka.integrations.aiogram import AiogramProvider, setup_dishka
 
-from gcbot.config import load_config
+from gcbot.config import Config, load_config
 from gcbot.port.adapter.aiogram_resources import starting_router
 from gcbot.port.adapter.dependency_provider import DependencyProvider
 from gcbot.port.adapter.sqlalchemy_resources.tables import metadata
@@ -36,7 +36,10 @@ async def main():
     container = make_async_container(
         DependencyProvider(),
         AiogramProvider(),
-        context={AsyncEngine: engine}
+        context={
+            AsyncEngine: engine,
+            Config: config
+        }
     )
     setup_dishka(container=container, router=dp)
     setup_dialogs(dp)

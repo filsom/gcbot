@@ -53,6 +53,7 @@ class WorkoutDialog(StatesGroup):
     categories = State()
     view = State()
 
+
 class DayMenuDialog(StatesGroup):
     start = State()
     view = State()
@@ -62,3 +63,14 @@ class WorkoutDialog(StatesGroup):
     start = State()
     categories = State()
     view = State()
+
+
+class DayMenuDialog(StatesGroup):
+    start = State()
+    view = State()
+
+
+class ContentDialog(StatesGroup):
+    start = State()
+    workout = State()
+    upload_recipes = State()
