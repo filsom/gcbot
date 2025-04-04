@@ -1,0 +1,9 @@
+from .router import starting_router
+from .dialogs.dialog_with_anon_user import anon_starting_dialog
+from .dialogs.dialog_with_free_user import free_starting_dialog
+from .dialogs.dialog_with_paid_user import paid_starting_dialog
+
+
+starting_router.include_router(anon_starting_dialog)
+starting_router.include_router(free_starting_dialog)
+starting_router.include_router(paid_starting_dialog)

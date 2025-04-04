@@ -1,0 +1,45 @@
+import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncConnection
+
+from gcbot.port.adapter.sqlalchemy_resources.tables import users_table, groups_table
+
+
+class UserStorage:
+    def __init__(self, connection: AsyncConnection):
+        self.connection = connection
+
+    async def add_user(self, user_id: int, email: str):
+        insert_stmt = (
+            sa.insert(users_table)
+            .values(
+                user_id=user_id,
+                email=email
+            )
+        )
+        await self.connection.execute(insert_stmt)
+
+    async def insert_user_in_group(self, email: str, group_id: int):
+        insert_stmt = (
+            sa.insert(groups_table)
+            .values(
+                email=email,
+                group_id=group_id
+            )
+        )
+        await self.connection.execute(insert_stmt)
+
+    async def delete_user_from_group(self, email: str, group_id: int):
+        delete_stmt = (
+            sa.delete(groups_table)
+            .where(groups_table.c.email == email)
+            .where(groups_table.c.group_id == group_id)
+        )
+        await self.connection.execute(delete_stmt)
+
+    async def update_user(self, values: dict, user_id: int):
+        update_stmt = (
+            sa.update(users_table)
+            .values(values)
+            .where(users_table.c.user_id == user_id)
+        )
+        await self.connection.execute(update_stmt)

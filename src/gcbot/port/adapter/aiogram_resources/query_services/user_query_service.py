@@ -1,0 +1,83 @@
+from enum import StrEnum, auto
+from aiogram.fsm.state import State
+
+from gcbot.domain.model.group import Group
+from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import (
+    AdminStartingDialog, 
+    AnonStartingDialog,
+    FoodDialog, 
+    FreeStartingDialog, 
+    PaidStartingDialog,
+    WorkoutDialog
+)
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_json_fetchers import UserJsonFetcher
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_json_fetcher import WorkoutJsonFetcher
+
+
+class UserQueryService:
+    def __init__(
+        self, 
+        user_fetcher: UserJsonFetcher,
+        workout_fetcher: WorkoutJsonFetcher
+    ) -> None:
+        self.user_fetcher = user_fetcher
+        self.workout_fetcher = workout_fetcher
+
+    async def query_command_start(self, user_id: int) -> State:
+        user_data = await self.user_fetcher \
+            .fetch_user_and_groups_with_id(user_id)
+        if user_data is None:
+            dialog_state = AnonStartingDialog.start
+        else:
+            if Group.ADMIN in user_data["groups"]:
+                dialog_state = AdminStartingDialog.start
+            elif user_data["groups"]:
+                dialog_state = PaidStartingDialog.start
+            else:
+                dialog_state = FreeStartingDialog.check_access
+        return dialog_state
+    
+    async def query_confirm_email_address(self, user_id: int) -> dict:
+        user_data = await self.user_fetcher \
+            .fetch_user_and_groups_with_id(user_id)
+        if user_data["groups"]:
+            user_data.update({"dialog_state": PaidStartingDialog.start})
+        else:
+            last_workout = await self.workout_fetcher \
+                .fetch_last_workout()
+            user_data.update({"dialog_state": FreeStartingDialog.start})
+            user_data.update({"workout": last_workout})
+        return user_data
+    
+    async def query_payment_verification(self, user_id: int) -> State | None:
+        user_data = await self.user_fetcher \
+            .fetch_user_and_groups_with_id(user_id)
+        if user_data["groups"]:
+            dialog_state = PaidStartingDialog.start
+        else:
+            dialog_state = None
+        return dialog_state
+    
+    async def query_user_section(self, user_id: int, group_id: int) -> dict:
+        user_data = await self.user_fetcher \
+            .fetch_user_and_groups_with_id(user_id)
+        if group_id in user_data["groups"] or Group.ADMIN in user_data["groups"]:
+            if group_id == Group.FOOD:
+                dialog_state = FoodDialog.start
+            else:
+                dialog_state = WorkoutDialog.start
+            user_data.update({"dialog_state": dialog_state})
+        else:
+            button_status = {}
+            if group_id == Group.FOOD:
+                button_status.update({
+                    "button_workout": True,
+                    "button_food": False
+                })
+            else:
+                button_status.update({
+                    "button_workout": False,
+                    "button_food": True
+                })
+            user_data.update({"button_status": button_status})
+        return user_data

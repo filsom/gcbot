@@ -1,6 +1,8 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncConnection
 
+from gcbot.port.adapter.sqlalchemy_resources.tables import users_table, groups_table
+
 
 class UserJsonFetcher:
     def __init__(self, connection: AsyncConnection):
@@ -12,6 +14,7 @@ class UserJsonFetcher:
                 sa.func.json_build_object(
                     "user_id", users_table.c.user_id,
                     "email", users_table.c.email,
+                    "norma_kcal", users_table.c.norma_kkal,
                     "groups", sa.case(
                         (groups_table.c.group_id == None, []),
                         else_=sa.func.json_agg(groups_table.c.group_id)
