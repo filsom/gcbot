@@ -16,7 +16,7 @@ from gcbot.port.adapter.aiogram_resources.bot import (
 )
 
 
-class WebAppContainer(Provider):
+class FastApiContainer(Provider):
     bot = from_context(provides=Bot, scope=Scope.APP)
     dp = from_context(provides=Dispatcher, scope=Scope.APP)
     config = from_context(provides=Config, scope=Scope.APP)
@@ -39,27 +39,27 @@ async def lifespan(app: FastAPI):
     await app.state.dishka_container.close()
 
 
-def create_web_app():
+def create_app():
     config = Config('../.env')
     engine = create_async_engine(config.get("DB_URL"), echo=True)
     bot = create_bot(config)
     bot_container = create_bot_container(config, engine)
     dp = create_dispatcher(bot_container)
 
-    web_app = FastAPI(lifespan=lifespan)
-    web_app.include_router(router)
-    web_app_container = make_async_container(
-        WebAppContainer(),
+    app = FastAPI(lifespan=lifespan)
+    app.include_router(router)
+    app_container = make_async_container(
+        FastApiContainer(),
         context={
             Bot: bot,
             Dispatcher: dp,
             Config: config
         }
     )
-    web_app.state.bot_container = bot_container
-    setup_dishka(web_app_container, web_app)
-    return web_app
+    app.state.bot_container = bot_container
+    setup_dishka(app_container, app)
+    return app
 
 
 if __name__ == "__main__":
-    uvicorn.run(create_web_app(), port=8000, lifespan="on")
+    uvicorn.run(create_app(), port=8000, lifespan="on")
