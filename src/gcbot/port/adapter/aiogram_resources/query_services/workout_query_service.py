@@ -43,5 +43,4 @@ class WorkoutQueryService:
                 text = "Все тренировки данной категории добавлены в избранное ❤️"
             data_workout["text"] = text
             data_workout["is_empty"] = True
-        print(data_workout)
         return data_workout
