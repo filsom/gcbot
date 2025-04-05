@@ -30,4 +30,7 @@ class UserJsonFetcher:
             .where(users_table.c.user_id == user_id)
         )
         result = (await self.connection.execute(query)).scalar()
+        if result is not None:
+            if result["groups"][0] is None:
+                result["groups"] = []
         return result

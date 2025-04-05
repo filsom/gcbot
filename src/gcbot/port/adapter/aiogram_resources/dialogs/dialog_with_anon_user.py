@@ -26,7 +26,6 @@ async def send_last_workout(
     if len(last_workout["text"]) < 1024:
         caption = last_workout["text"]
     builder = MediaGroupBuilder(caption=caption)
-    print(last_workout)
     for media in last_workout["media"]:
         builder.add_video(media)
     if builder.caption is not None:
