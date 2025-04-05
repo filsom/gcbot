@@ -45,7 +45,6 @@ def create_app():
     bot = create_bot(config)
     bot_container = create_bot_container(config, engine)
     dp = create_dispatcher(bot_container)
-
     app = FastAPI(lifespan=lifespan)
     app.include_router(router)
     app_container = make_async_container(
