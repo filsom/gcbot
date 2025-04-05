@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 
 from gcbot.port.adapter.sqlalchemy_resources.tables import (
-    workouts_medias_table,
+    medias_table,
     workouts_table,
     like_workouts_table,
     categories_table
@@ -41,7 +41,7 @@ class WorkoutJsonFetcher:
             name_categories.append(row)
         text = None
         if not name_categories:
-            text = "Избранные тренировки отсутсвуют 🤷🏻"
+            text = "Избранные категории с тренировками отсутствуют 🤷🏻"
         return {
             "categories": name_categories,
             "text": text
@@ -65,8 +65,11 @@ class WorkoutJsonFetcher:
             self._select_json_workout()
             .select_from(workouts_table)
             .join(
-                workouts_medias_table,
-                workouts_medias_table.c.workout_id == workouts_table.c.workout_id
+                medias_table, 
+                sa.and_(
+                    medias_table.c.entity_id == workouts_table.c.workout_id,
+                    medias_table.c.entity_type == workouts_table.c.entity_type,
+                )
             )
             .group_by(
                 workouts_table.c.workout_id,
@@ -123,8 +126,11 @@ class WorkoutJsonFetcher:
             self._select_json_workout()
             .select_from(workouts_table)
             .join(
-                workouts_medias_table, 
-                workouts_medias_table.c.workout_id == workouts_table.c.workout_id
+                medias_table, 
+                sa.and_(
+                    medias_table.c.entity_id == workouts_table.c.workout_id,
+                    medias_table.c.entity_type == workouts_table.c.entity_type,
+                )
             )
             .join(
                 liked, 
@@ -148,8 +154,8 @@ class WorkoutJsonFetcher:
                     "workout_id", workouts_table.c.workout_id,
                     "media", sa.func.json_agg(
                         aggregate_order_by(
-                            workouts_medias_table.c.file_id, 
-                            workouts_medias_table.c.message_id
+                            medias_table.c.file_id, 
+                            medias_table.c.message_id
                         )
                     ),
                     "text", workouts_table.c.text

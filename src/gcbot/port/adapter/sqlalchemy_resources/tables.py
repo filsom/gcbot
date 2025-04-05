@@ -1,8 +1,15 @@
+from enum import StrEnum, auto
 from uuid import uuid4
 import sqlalchemy as sa
 
 
 metadata = sa.MetaData()
+
+
+class EntityType(StrEnum):
+    WORKOUT = auto()
+    MAILING = auto()
+    SUPPORT_VOICE = auto()
 
 
 users_table = sa.Table(
@@ -35,18 +42,20 @@ like_workouts_table = sa.Table(
 workouts_table = sa.Table(
     'workouts',
     metadata,
-    sa.Column('workout_id', sa.UUID, primary_key=True, default=uuid4, nullable=False),
+    sa.Column('workout_id', sa.UUID, primary_key=True, nullable=False),
+    sa.Column('entity_type', sa.String(30), nullable=False),
     sa.Column('category_id', sa.ForeignKey('categories.category_id', ondelete="CASCADE"), nullable=False),
-    sa.Column('text', sa.String(3000), nullable=False),
+    sa.Column('text', sa.String(5000), nullable=False),
     sa.Column('created_at', sa.DateTime, nullable=False),
 )
 
 
-workouts_medias_table = sa.Table(
-    'workouts_medias',
+medias_table = sa.Table(
+    'medias',
     metadata,
     sa.Column('media_id', sa.UUID, primary_key=True, default=uuid4, nullable=False),
-    sa.Column('workout_id', sa.ForeignKey('workouts.workout_id', ondelete="CASCADE"), nullable=False),
+    sa.Column('entity_id', sa.UUID, nullable=False),
+    sa.Column('entity_type', sa.String(20), nullable=False),
     sa.Column('file_id', sa.String(200), nullable=False),
     sa.Column('file_unique_id', sa.String(100), nullable=False),
     sa.Column('message_id', sa.Integer, nullable=False),
@@ -83,3 +92,5 @@ ingredients_table = sa.Table(
     sa.Column('value', sa.DECIMAL(20, 0), nullable=False),
     sa.Column('unit', sa.String, nullable=False),
 )
+
+print(EntityType.WORKOUT)

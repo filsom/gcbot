@@ -7,6 +7,7 @@ from gcbot.port.adapter.sqlalchemy_resources.tables import (
     ingredients_table
 )
 
+
 class RecipeStorage:
     def __init__(self, connection: AsyncConnection):
         self.connection = connection

@@ -6,9 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.dialects.postgresql import insert
 
 from gcbot.port.adapter.sqlalchemy_resources.tables import (
+    EntityType,
     like_workouts_table, 
     workouts_table, 
-    workouts_medias_table
+    medias_table
 )
 
 
@@ -48,6 +49,7 @@ class WorkoutStorage:
             sa.insert(workouts_table)
             .values(
                 workout_id=workout_id,
+                entity_type=EntityType.WORKOUT,
                 category_id=category_id,
                 text=text,
                 created_at=datetime.now()
@@ -57,10 +59,11 @@ class WorkoutStorage:
         for media in medias:
             media.update({
                 "media_id": uuid4(),
-                "workout_id": workout_id
+                "entity_id": workout_id,
+                "entity_type":EntityType.WORKOUT
             })
         insert_medias = (
-            sa.insert(workouts_medias_table)
+            sa.insert(medias_table)
             .values(medias)
         )
         await self.connection.execute(insert_medias)
