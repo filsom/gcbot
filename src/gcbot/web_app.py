@@ -1,15 +1,19 @@
 from contextlib import asynccontextmanager
 
-from aiogram import Bot, Dispatcher
 import uvicorn
-from aiogram.types import Update
-from fastapi import APIRouter, FastAPI, Request
+from aiogram import Bot, Dispatcher
+from fastapi import FastAPI
 from starlette.config import Config
-from dishka.integrations.fastapi import setup_dishka, FromDishka, inject
+from dishka.integrations.fastapi import setup_dishka
 from dishka import Provider, Scope, from_context, make_async_container
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from gcbot.main.bot import create_bot, create_bot_container, create_dispatcher
+from gcbot.port.adapter.fastapi_resources.router import router
+from gcbot.port.adapter.aiogram_resources.bot import (
+    create_bot, 
+    create_bot_container, 
+    create_dispatcher
+)
 
 
 class WebAppContainer(Provider):
@@ -33,23 +37,6 @@ async def lifespan(app: FastAPI):
     await bot.session.close()
     await app.state.bot_container.close()
     await app.state.dishka_container.close()
-
-
-router = APIRouter()
-
-
-@router.post("/webhook")
-@inject
-async def webhook(
-    bot: FromDishka[Bot],
-    dp: FromDishka[Dispatcher],
-    request: Request
-):
-    update = Update.model_validate(
-        await request.json(),
-        context={"bot": bot}
-    )
-    await dp.feed_update(bot, update)
 
 
 def create_web_app():
