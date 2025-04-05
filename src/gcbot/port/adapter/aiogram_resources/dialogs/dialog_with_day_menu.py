@@ -73,6 +73,7 @@ async def on_click_select_recipe(
             list_recipes_ids.append(int(recipe_id))
         day_menu = await service.make_day_menu(
             cmd.MakeMenuCommand(
+                callback.from_user.id,
                 list_recipes_ids,
                 Decimal(dialog_manager.start_data["norma_kcal"]),
                 False
@@ -107,6 +108,7 @@ async def on_click_my_snack(
     
     day_menu = await service.make_day_menu(
         cmd.MakeMenuCommand(
+            callback.from_user.id,
             list_recipes_ids,
             Decimal(dialog_manager.start_data["norma_kcal"]),
             True

@@ -14,6 +14,7 @@ class CalculateKсalCommand:
 
 @dataclass
 class MakeMenuCommand:
+    user_id: int
     recipes_ids: list[int]
     norma_kcal: D
     is_my_snack: bool

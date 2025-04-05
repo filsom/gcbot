@@ -33,23 +33,39 @@ class NormaDay:
             norma_day["norma_day"].update({key: str(macros[key])})
         return norma_day
     
+    def asmessage(self) -> str:
+        return f"Бoт расчитал:\n{self.repr()}"
+    
 
-def calculate_daily_norm(
-    age: D,
-    height: D,
-    weight: D,
-    coefficient: D,
+@dataclass
+class InputData:
+    age: D
+    height: D
+    weight: D
+    coefficient: D
     target_procent: D
-) -> NormaDay:
-    value = (D("10")*weight \
-            + D("6.25")*height \
-            - D("5")*age-D("161")) \
-            * coefficient
-    norma_kcal = abs(value*target_procent).quantize(D("1"))
+
+    def asmessage(self) -> str:
+        return (
+            f"Пользователь ввел:\n"
+            f"Возраст - {self.age} лет\n"
+            f"Рост - {self.height} см\n"
+            f"Вес - {self.weight} кг\n"
+            f"Aктивность - {self.coefficient}\n"
+            f"Цель - {self.target_procent}\n"
+        )
+
+
+def calculate_daily_norm(input_data: InputData) -> NormaDay:
+    value = (D("10")*input_data.weight \
+            + D("6.25")*input_data.height \
+            - D("5")*input_data.age-D("161")) \
+            * input_data.coefficient
+    norma_kcal = abs(value*input_data.target_procent).quantize(D("1"))
     if norma_kcal < 1200:
         norma_kcal = D("1200")
-    protein = (D("1.5")*weight).quantize(D("1"))
-    fat = weight.quantize(D("1"))
+    protein = (D("1.5")*input_data.weight).quantize(D("1"))
+    fat = input_data.weight.quantize(D("1"))
     carbs = abs((norma_kcal-D("100")
             - (fat*D("9"))
             - (protein*D("4")))

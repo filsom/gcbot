@@ -1,11 +1,15 @@
+from datetime import datetime
 from decimal import Decimal as D
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncConnection
+from starlette.config import Config
 
 from gcbot.application import commands as cmd
-from gcbot.domain.model.day_menu import adjust_recipes, present_the_menu
-from gcbot.domain.model.norma_day import calculate_daily_norm
+from gcbot.domain.model.day_menu import adjust_recipes, make_text_for_message, present_the_menu
+from gcbot.domain.model.history import HistoryMessage
+from gcbot.domain.model.norma_day import InputData, calculate_daily_norm
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.message_storage import MessageStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_storage import RecipeStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_storage import UserStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_storage import WorkoutStorage
@@ -14,15 +18,19 @@ from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_storage i
 class UserService:
     def __init__(
         self, 
+        config: Config,
         connection: AsyncConnection,
         user_storage: UserStorage,
         recipe_storage: RecipeStorage,
-        workout_storage: WorkoutStorage
-    ):
+        workout_storage: WorkoutStorage,
+        message_storage: MessageStorage
+    ) -> None:
+        self.config = config
         self.connection = connection
         self.user_storage = user_storage
         self.recipe_storage = recipe_storage
         self.workout_storage = workout_storage
+        self.message_storage = message_storage
 
     async def add_workout_to_favorites(self, user_id: int, workout_id: UUID) -> None:
         async with self.connection.begin():
@@ -50,6 +58,19 @@ class UserService:
                 adjusted_recipes,
                 command.is_my_snack
             )
+            message_text = make_text_for_message(
+                adjusted_recipes,
+                presentation.get("snack_kcal", None),
+                self.config.get("RECIPE_URL")
+            )
+            history_message = HistoryMessage(
+                self.config.get("ADMIN_ID"),
+                command.user_id,
+                message_text,
+                datetime.now()
+            )
+            await self.message_storage.add_message(history_message)
+            await self.connection.commit()
             return presentation
 
     async def create_user(self, user_id: int, email: str):
@@ -59,18 +80,31 @@ class UserService:
 
     async def calculate_norma(self, command: cmd.CalculateKсalCommand) -> dict:
         async with self.connection.begin():
-            norma_day = calculate_daily_norm(
+            input_data = InputData(
                 command.age,
                 command.height,
                 command.weight,
                 command.coefficient,
                 command.target_procent
             )
+            norma_day = calculate_daily_norm(input_data)
             await self.user_storage \
                 .update_user(
                     {"norma_kcal": norma_day.kcal}, 
                     command.user_id
                 )
+            message_text = "{}\n{}".format(
+                input_data.asmessage(),
+                norma_day.asmessage()
+            )
+            history_message = HistoryMessage(
+                self.config.get("ADMIN_ID"),
+                command.user_id,
+                message_text,
+                datetime.now()
+            )
+            await self.message_storage.add_message(history_message)
+            await self.connection.commit()
             return norma_day.asdict()
 
     async def input_norma(self, user_id: int, norma_kcal: D):

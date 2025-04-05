@@ -16,6 +16,7 @@ from gcbot.application.admin_service import AdminService
 from gcbot.application.user_service import UserService
 from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
 from gcbot.port.adapter.aiogram_resources.query_services.workout_query_service import WorkoutQueryService
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.message_storage import MessageStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_json_fetcher import RecipeJsonFetcher
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_storage import RecipeStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_json_fetcher import UserJsonFetcher
@@ -87,3 +88,4 @@ class TelegramBotProvider(Provider):
     workout_query_service = provide(WorkoutQueryService, scope=Scope.REQUEST)
     recipe_fetcher = provide(RecipeJsonFetcher, scope=Scope.REQUEST)
     admin_service = provide(AdminService, scope=Scope.REQUEST)
+    message_storage = provide(MessageStorage, scope=Scope.REQUEST)
