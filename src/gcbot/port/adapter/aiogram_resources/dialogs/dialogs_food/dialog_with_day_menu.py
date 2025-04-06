@@ -11,7 +11,8 @@ from dishka.integrations.aiogram_dialog import inject
 
 from gcbot.application import commands as cmd
 from gcbot.application.user_service import UserService
-from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import DayMenuDialog, PaidStartingDialog
+from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import PaidStartingDialog
+from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_food.dialog_state import DayMenuDialog
 from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
 
 

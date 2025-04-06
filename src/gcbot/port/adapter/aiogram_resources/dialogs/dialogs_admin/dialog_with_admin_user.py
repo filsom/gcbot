@@ -5,18 +5,19 @@ from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import (
     AdminStartingDialog, 
     ContentDialog
 )
+from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.dialog_state import UsersGroupsDialog
 
 
 admin_starting_dialog = Dialog(
     Window(
         text.Format("Приветсвую, 👋🏻\n\nПанель администратора."),
         kbd.Column(
-            # kbd.Start(
-            #     text.Const("Юзеры/Группы"),
-            #     id="users_groups",
-            #     state=UsersGroupsDialog.start,
-            #     show_mode=ShowMode.EDIT,
-            # ),
+            kbd.Start(
+                text.Const("Юзеры/Группы"),
+                id="users_groups",
+                state=UsersGroupsDialog.start,
+                show_mode=ShowMode.EDIT,
+            ),
             kbd.Start(
                 text.Const("Контент"),
                 id="content",

@@ -22,6 +22,25 @@ class AdminService:
         self.recipe_storage = recipe_storage
         self.workout_storage = workout_storage
 
+
+    async def add_user_in_group(self, email: str, group_id: int) -> None:
+        async with self.connection.begin():
+            await self.user_storage.insert_user_in_group(email, group_id)
+            await self.connection.commit()
+
+    async def delete_user_from_group(self, email: str, group_id: int) -> None:
+        async with self.connection.begin():
+            await self.user_storage.delete_user_from_group(email, group_id)
+            await self.connection.commit()
+
+    async def change_user_email(self, old_email: int, new_email: str) -> None:
+        async with self.connection.begin():
+            await self.user_storage \
+                .update_user_with_email({"email": new_email}, old_email)
+            await self.user_storage \
+                .update_email_in_groups({"email": new_email}, old_email)
+            await self.connection.commit()
+
     async def unload_from_google_sheet(self) -> None:
         async with self.connection.begin():
             head = await self.recipe_storage.count()

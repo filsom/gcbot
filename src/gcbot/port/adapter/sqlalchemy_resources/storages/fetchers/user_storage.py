@@ -36,10 +36,31 @@ class UserStorage:
         )
         await self.connection.execute(delete_stmt)
 
-    async def update_user(self, values: dict, user_id: int):
+    async def update_user_with_id(self, values: dict, user_id: int):
         update_stmt = (
-            sa.update(users_table)
-            .values(values)
+            self._update(values)
             .where(users_table.c.user_id == user_id)
         )
         await self.connection.execute(update_stmt)
+
+    async def update_email_in_groups(self, values: dict, email: str):
+        update_stmt = (
+            sa.update(groups_table)
+            .values(values)
+            .where(groups_table.c.email == email)
+        )
+        await self.connection.execute(update_stmt)
+
+    async def update_user_with_email(self, values: dict, email: str):
+        update_stmt = (
+            self._update(values)
+            .where(users_table.c.email == email)
+        )
+        await self.connection.execute(update_stmt)
+
+    def _update(self, values: dict):
+        update_stmt = (
+            sa.update(users_table)
+            .values(values)
+        )
+        return update_stmt

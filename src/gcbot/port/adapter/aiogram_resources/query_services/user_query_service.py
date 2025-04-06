@@ -1,15 +1,15 @@
 from aiogram.fsm.state import State
+from starlette.config import Config
 
 from gcbot.domain.model.day_menu import TypeMeal
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import (
     AdminStartingDialog, 
     AnonStartingDialog,
-    DayMenuDialog,
-    FoodDialog, 
     FreeStartingDialog, 
     PaidStartingDialog,
     WorkoutDialog
 )
+from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_food.dialog_state import DayMenuDialog, FoodDialog
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_json_fetcher import RecipeJsonFetcher
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_json_fetcher import UserJsonFetcher
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_json_fetcher import WorkoutJsonFetcher
@@ -24,10 +24,12 @@ class Group(object):
 class UserQueryService:
     def __init__(
         self, 
+        config: Config,
         user_fetcher: UserJsonFetcher,
         workout_fetcher: WorkoutJsonFetcher,
         recipe_fetcher: RecipeJsonFetcher
     ) -> None:
+        self.config = config
         self.user_fetcher = user_fetcher
         self.workout_fetcher = workout_fetcher
         self.recipe_fetcher = recipe_fetcher
@@ -113,3 +115,39 @@ class UserQueryService:
     async def query_recipe_with_type_meal(self, type_meal: str) -> dict:
         return await self.recipe_fetcher \
             .fetch_partial_recipe_with_type_meal(type_meal)
+    
+    async def query_user_for_admin(self, email: str) -> dict:
+        user_data = await self.user_fetcher \
+            .fetch_user_and_groups_with_email(email)
+        if user_data is None:
+            return {}
+        email = user_data.pop("email")
+        user_data.update({"current_email": email})
+        user_data["url"] = self.config.get("APP_URL_WEBHOOK") \
+            .format(f"/history/user/{user_data["user_id"]}")
+        select_group = [
+            ("К еде", Group.FOOD),
+            ("К тренировкам", Group.WORKOUT)
+        ]
+        if Group.ADMIN in user_data["groups"]:
+            alias = "Администратор"
+            user_data.pop("url")
+        elif not user_data["groups"]:
+            alias = "🤷🏻"
+            user_data.update({"select_groups": select_group})
+        else:
+            alias = []
+            for group in user_data["groups"]:
+                if group == Group.FOOD:
+                    alias.append("Еда")
+                    select_group.remove(("К еде", group))
+                if group == Group.WORKOUT:
+                    alias.append("Тренировки")
+                    select_group.remove(("К тренировкам", group))
+            alias = ", ".join(alias)
+            user_data.update({"select_groups": select_group})
+        user_data.update({
+            "alias_groups": alias,
+        }) 
+        print(user_data)
+        return user_data

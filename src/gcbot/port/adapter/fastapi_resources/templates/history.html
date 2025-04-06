@@ -79,6 +79,15 @@
             text-align: right;
         }
 
+        .empty-message {
+            color: #8a8a8a;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -91,14 +100,16 @@
 </head>
 <body>
     <div class="chat-box" id="chatBox">
-        {% for msg in messages %}
-            <div class="message {% if msg.user == 'admin' %}user1{% else %}user2{% endif %}">
-                <div>
-                    {{ msg.text }}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="message {% if msg.user == 'admin' %}user1{% else %}user2{% endif %}">
+                    <div>{{ msg.text }}</div>
+                    <span class="timestamp">{{ msg.time }}</span>
                 </div>
-                <span class="timestamp">{{ msg.time }}</span>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <div class="empty-message">История сообщений пуста</div>
+        {% endif %}
     </div>
 
     <script>

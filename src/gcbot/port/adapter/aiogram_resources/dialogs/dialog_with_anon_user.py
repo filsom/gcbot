@@ -1,6 +1,5 @@
 import asyncio
 
-from email_validator import validate_email, EmailNotValidError
 from aiogram import F, Bot, types as t
 from aiogram.fsm.state import State
 from aiogram.utils.media_group import MediaGroupBuilder
@@ -11,6 +10,7 @@ from dishka.integrations.aiogram_dialog import inject
 
 from gcbot.application.user_service import UserService
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import AnonStartingDialog
+from gcbot.port.adapter.aiogram_resources.dialogs.widgets import get_input_email_address, input_email_address_handler
 from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
 
 
@@ -39,25 +39,6 @@ async def send_last_workout(
         show_mode=ShowMode.DELETE_AND_SEND,
         mode=StartMode.RESET_STACK
     )
-
-async def get_input_email_address(dialog_manager: DialogManager, **kwargs):
-    return {"email": dialog_manager.dialog_data.get("email", None)}
-
-
-async def input_email_address_handler(
-    message: t.Message,
-    button,
-    dialog_manager: DialogManager,
-    value,
-    **kwargs
-):  
-    try:
-        email_info = validate_email(value)
-        dialog_manager.dialog_data["email"] = email_info.normalized.lower()
-        await dialog_manager.next()
-    except EmailNotValidError:
-        dialog_manager.show_mode = ShowMode.DELETE_AND_SEND
-        await message.answer("Некорректный @email адрес ❌")
 
 
 @inject

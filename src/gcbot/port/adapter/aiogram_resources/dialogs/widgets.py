@@ -3,9 +3,30 @@ from aiogram_dialog import DialogManager, ShowMode, StartMode, Window
 from aiogram_dialog.widgets import text, kbd, input
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
+from email_validator import validate_email, EmailNotValidError
 
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import PaidStartingDialog
 from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
+
+
+async def input_email_address_handler(
+    message: t.Message,
+    button,
+    dialog_manager: DialogManager,
+    value,
+    **kwargs
+):  
+    try:
+        email_info = validate_email(value)
+        dialog_manager.dialog_data["email"] = email_info.normalized.lower()
+        await dialog_manager.next()
+    except EmailNotValidError:
+        dialog_manager.show_mode = ShowMode.DELETE_AND_SEND
+        await message.answer("Некорректный @email адрес ❌")
+
+
+async def get_input_email_address(dialog_manager: DialogManager, **kwargs):
+    return {"email": dialog_manager.dialog_data.get("email", None)}
 
 
 @inject
@@ -34,6 +55,13 @@ async def on_click_back_main(
         data={"user_id": callback.from_user.id},
         show_mode=ShowMode.EDIT,
         mode=StartMode.RESET_STACK
+    )
+
+
+def BackAdminPanel():
+    return kbd.Cancel(
+        text.Const("⬅️ В Админ панель"),
+        id="back_admin_panel",
     )
 
 
