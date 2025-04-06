@@ -40,7 +40,7 @@ async def lifespan(app: FastAPI):
     dp: Dispatcher = await app.state.dishka_container.get(Dispatcher)
     engine: AsyncEngine = await app.state.bot_container.get(AsyncEngine)
     await bot.set_webhook(
-        config.get("APP_URL_WEBHOOK"),
+        config.get("APP_URL_WEBHOOK").format("/webhook"),
         allowed_updates=dp.resolve_used_update_types(),
         drop_pending_updates=True
     )
