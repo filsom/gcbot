@@ -1,4 +1,3 @@
-from datetime import datetime
 from decimal import Decimal as D
 from uuid import UUID
 
@@ -6,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from starlette.config import Config
 
 from gcbot.application import commands as cmd
-from gcbot.domain.model.day_menu import adjust_recipes, make_text_for_message, present_the_menu
-from gcbot.domain.model.history import HistoryMessage
+from gcbot.domain.model.day_menu import adjust_recipes, present_the_menu
+from gcbot.domain.model.history_message import make_history_message_with_norma_day, make_history_with_day_menu
 from gcbot.domain.model.norma_day import InputData, calculate_daily_norm
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.message_storage import MessageStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_storage import RecipeStorage
@@ -58,18 +57,14 @@ class UserService:
                 adjusted_recipes,
                 command.is_my_snack
             )
-            message_text = make_text_for_message(
+            message = make_history_with_day_menu(
+                self.config.get("ADMIN_ID"),
+                command.user_id,
                 adjusted_recipes,
                 presentation.get("snack_kcal", None),
                 self.config.get("RECIPE_URL")
             )
-            history_message = HistoryMessage(
-                self.config.get("ADMIN_ID"),
-                command.user_id,
-                message_text,
-                datetime.now()
-            )
-            await self.message_storage.add_message(history_message)
+            await self.message_storage.add_message(message)
             await self.connection.commit()
             return presentation
 
@@ -93,17 +88,13 @@ class UserService:
                     {"norma_kcal": norma_day.kcal}, 
                     command.user_id
                 )
-            message_text = "{}\n{}".format(
-                input_data.asmessage(),
-                norma_day.asmessage()
-            )
-            history_message = HistoryMessage(
+            message = make_history_message_with_norma_day(
                 self.config.get("ADMIN_ID"),
                 command.user_id,
-                message_text,
-                datetime.now()
+                norma_day,
+                input_data
             )
-            await self.message_storage.add_message(history_message)
+            await self.message_storage.add_message(message)
             await self.connection.commit()
             return norma_day.asdict()
 

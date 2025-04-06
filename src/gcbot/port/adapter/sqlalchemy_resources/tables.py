@@ -93,4 +93,13 @@ ingredients_table = sa.Table(
     sa.Column('unit', sa.String, nullable=False),
 )
 
-print(EntityType.WORKOUT)
+
+messages_table = sa.Table(
+    'messages',
+    metadata,
+    sa.Column('oid', sa.BigInteger, primary_key=True, autoincrement=True, nullable=False),
+    sa.Column('sender_id', sa.BigInteger, nullable=False),
+    sa.Column('recipient_id', sa.BigInteger, nullable=False),
+    sa.Column('text', sa.String(4000), nullable=False),
+    sa.Column('sent_to', sa.DateTime, nullable=False)
+)

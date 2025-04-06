@@ -3,8 +3,6 @@ import re
 from dataclasses import dataclass
 from decimal import Decimal as D
 
-from gcbot.domain.model.history import HistoryMessage
-
 
 class TypeMeal(object):
     BREAKFAST = 1
@@ -84,21 +82,6 @@ class Recipe:
     @property
     def index_table(self) -> str:
         return f"{self.recipe_id+1}:{self.recipe_id+1}"
-    
-
-def make_text_for_message(
-    adjusted_recipes: list[Recipe],
-    kcal_snack: D | None,
-    url: str
-) -> str:
-    message = ""
-    for recipe in adjusted_recipes:
-        text = f"{recipe.asmessage()}\n" \
-            .format(url.format(recipe.index_table))
-        message += text
-    if kcal_snack is not None:
-        message += f"\nПользователю необходимо добрать - {kcal_snack}ККал"
-    return message
     
 
 def present_the_menu(
