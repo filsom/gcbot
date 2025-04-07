@@ -13,8 +13,8 @@ from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.dialog_state imp
 )
 from gcbot.port.adapter.aiogram_resources.dialogs.widgets import (
     BackAdminPanel, 
-    get_input_email_address, 
-    input_email_address_handler
+    get_input_email_address,
+    input_email_address_handler, 
 )
 from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
 
@@ -24,11 +24,17 @@ async def get_user_data_for_admin(
     dialog_manager: DialogManager,
     query_service: FromDishka[UserQueryService],
     **kwargs
-):
-    query_result = await query_service \
-        .query_user_for_admin(
-            dialog_manager.dialog_data["email"]
-        )
+):  
+    try:
+        query_result = await query_service \
+            .query_user_for_admin_with_email(
+                dialog_manager.dialog_data["email"]
+            )
+    except KeyError:
+        query_result = await query_service \
+            .query_user_for_admin_with_id(
+                dialog_manager.start_data["user_id"]
+            )
     dialog_manager.dialog_data.update(**query_result)
     return query_result
 
@@ -55,6 +61,7 @@ async def on_click_add_user_in_groups(
     )
 
 
+
 @inject
 async def on_click_selected_group(
     callback: t.CallbackQuery,
@@ -76,12 +83,32 @@ async def on_click_save_changed_email_address(
     button,
     dialog_manager: DialogManager,
     service: FromDishka[AdminService]
-):  
+):
     await service.change_user_email(
         dialog_manager.dialog_data["current_email"],
         dialog_manager.find("input_user_new_email_address").get_value()
     )
+    if dialog_manager.start_data is not None:
+        if dialog_manager.start_data.get("open_from_message", False):
+            await dialog_manager.switch_to(UsersGroupsDialog.profile)
+    else:
+        await dialog_manager.done(show_mode=ShowMode.DELETE_AND_SEND)
+
+
+async def get_open_status(dialog_manager: DialogManager, **kwargs):
+    if dialog_manager.start_data is not None:
+        return {"open_from_message": dialog_manager.start_data.get("open_from_message", False)}
+    return {}
+
+
+@inject
+async def on_click_close_profile_from_message(
+    callback: t.CallbackQuery,
+    button,
+    dialog_manager: DialogManager,
+):
     await dialog_manager.done()
+    await callback.message.delete()
 
 
 users_groups_dialog = Dialog(
@@ -99,7 +126,7 @@ users_groups_dialog = Dialog(
         text.Format(
             "👤 id {user_id}\n"
             "📧 @email: {current_email}\n"
-            "👥 GC групп: {alias_groups}\n",
+            "👥 GC группы: {alias_groups}\n",
             when=F["user_id"]
         ),
         kbd.Url(
@@ -120,9 +147,15 @@ users_groups_dialog = Dialog(
             on_click=kbd.Next(),
             when=F["user_id"]
         ),
-        BackAdminPanel(),
+        kbd.Button(
+            text.Const("Закрыть"), 
+            id="close_and_delete", 
+            when=F["open_from_message"], 
+            on_click=on_click_close_profile_from_message
+        ),
+        BackAdminPanel("open_from_message"),
         state=UsersGroupsDialog.profile,
-        getter=get_user_data_for_admin
+        getter=[get_user_data_for_admin]
     ),
     Window(
         text.Const("Введите новый @email пользователя 🔎"),
@@ -130,7 +163,13 @@ users_groups_dialog = Dialog(
             id="input_user_new_email_address",
             on_success=input_email_address_handler
         ),
-        BackAdminPanel(),
+        kbd.Button(
+            text.Const("Закрыть"), 
+            id="close_and_delete", 
+            when=F["open_from_message"], 
+            on_click=on_click_close_profile_from_message
+        ),
+        BackAdminPanel("open_from_message"),
         state=UsersGroupsDialog.inpute_email
     ),
     Window(
@@ -144,6 +183,7 @@ users_groups_dialog = Dialog(
         state=UsersGroupsDialog.change_email,
         getter=get_input_email_address
     ),
+    getter=get_open_status
 )
 
 

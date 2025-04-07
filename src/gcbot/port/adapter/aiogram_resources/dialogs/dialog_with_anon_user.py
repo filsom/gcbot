@@ -2,6 +2,7 @@ import asyncio
 
 from aiogram import F, Bot, types as t
 from aiogram.fsm.state import State
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram_dialog import Dialog, DialogManager, ShowMode, StartMode, Window, BaseDialogManager
 from aiogram_dialog.widgets import kbd, text, input
@@ -67,6 +68,27 @@ async def on_click_confirm_email_address(
                 bot,
                 workout
             )
+        )
+        parsed_data = await query_service \
+            .parse_user_data_for_admin(query_result)
+        forward_data = await query_service.make_preview_text(
+            parsed_data,
+            callback.from_user.id,
+            dialog_manager.dialog_data["email"]
+        )
+        builder = InlineKeyboardBuilder()
+        if forward_data.get("profile", False):
+            builder.button(text="Профиль", callback_data="user_profile_from_admin")
+        forward_message = await bot.send_message(
+            user_service.config.get("ADMIN_ID"),
+            forward_data["previw_text"],
+            reply_markup=builder.as_markup()
+        )
+        await user_service.add_history_message(
+            callback.from_user.id,
+            user_service.config.get("ADMIN_ID"),
+            dialog_manager.dialog_data["email"],
+            forward_message.message_id
         )
         await dialog_manager.next()
     else:

@@ -12,6 +12,19 @@ class HistoryMessage:
     recipient_id: int
     text: str
     sent_to: datetime
+    message_id: int | None = None
+
+    def text_for_preview_forward(self, username: str | None) -> str:
+        text = (
+            f"👤 id {self.sender_id}\n"
+            "{}\n"
+            f"Сообщение:\n{self.text}"
+        )
+        if username is not None:
+            text.format(f"@{username}")
+        else:
+            text.format("@username скрыт")
+        return text
 
 
 def make_history_message_with_norma_day(
@@ -21,8 +34,8 @@ def make_history_message_with_norma_day(
     input_data: InputData,
 ) -> HistoryMessage:
     text = "{}\n{}".format(
-        input_data.asmessage(),
-        norma_day.asmessage()
+        input_data.to_html(),
+        norma_day.to_html()
     )
     return HistoryMessage(
         sender_id,
@@ -39,17 +52,15 @@ def make_history_with_day_menu(
     kcal_snack: D | None,
     url: str
 ) -> HistoryMessage:
-    message = ""
-    for recipe in adjusted_recipes:
-        text = f"{recipe.asmessage()}\n" \
-            .format(url.format(recipe.index_table))
-        message += text
+    text = "\n".join(recipe.to_html(url) for recipe in adjusted_recipes)
     if kcal_snack is not None:
-        message += f"\nПользователю необходимо добрать - {kcal_snack}ККал"
+        text += (
+            f"<p><b>Пользователю необходимо добрать -</b> {kcal_snack} ККал</p>"
+        )
     history_message = HistoryMessage(
         sender_id,
         recipient_id,
-        message,
+        text,
         datetime.now()
     )
     return history_message

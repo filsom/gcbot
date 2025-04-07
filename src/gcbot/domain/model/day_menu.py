@@ -67,18 +67,29 @@ class Recipe:
         return (
             f"<b>Прием пищи:</b> {TRANSlATION_MAP.get(self.type_meal)}\n"
             f"<b>Название рецепта:</b> {self.name.title()}\n\n"
-            f"<b>Ингредиенты:</b>:\n{text}\n"
+            f"<b>Ингредиенты:</b> \n{text}\n"
         )
     
     def full_repr(self) -> str:
         return f"{self.partial_repr()}{self.text}"
     
-    def asmessage(self) -> str:
-        return (
-            "<b>Ссылка:</b> {}\n"
-            f"{self.partial_repr()}"
+    def to_html(self, url: str):
+        url = url.format(self.index_table)
+        ingredients_html = "".join(
+            [
+                f"<li>{ingredient.name} <b>{ingredient.value}{ingredient.unit}</b></li>" 
+                for ingredient in self.ingredients
+            ]
         )
-    
+        html = (
+            f"<p><b>Ссылка:</b> <a href='{url}'>{url}</a></p>"
+            f"<p><b>Прием пищи:</b> {self.type_meal}</p>"
+            f"<p><b>Название рецепта:</b> {self.name}</p>"
+            f"<p><b>Ингредиенты:</b></p>"
+            f"<ul>{ingredients_html}</ul>"
+        )
+        return html
+
     @property
     def index_table(self) -> str:
         return f"{self.recipe_id+1}:{self.recipe_id+1}"

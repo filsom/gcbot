@@ -1,4 +1,4 @@
-from aiogram import types as t
+from aiogram import F, Bot, types as t
 from aiogram_dialog import DialogManager, ShowMode, StartMode, Window
 from aiogram_dialog.widgets import text, kbd, input
 from dishka import FromDishka
@@ -17,6 +17,8 @@ async def input_email_address_handler(
     **kwargs
 ):  
     try:
+        await message.delete()
+        dialog_manager.show_mode = ShowMode.EDIT
         email_info = validate_email(value)
         dialog_manager.dialog_data["email"] = email_info.normalized.lower()
         await dialog_manager.next()
@@ -58,10 +60,13 @@ async def on_click_back_main(
     )
 
 
-def BackAdminPanel():
+def BackAdminPanel(when_key=None):
+    if when_key is not None:
+        when_key = ~F[when_key]
     return kbd.Cancel(
         text.Const("⬅️ В Админ панель"),
         id="back_admin_panel",
+        when=when_key
     )
 
 

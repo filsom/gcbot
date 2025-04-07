@@ -7,7 +7,9 @@ from .dialogs.dialogs_food.dialog_with_input_norma_day import input_norma_day_di
 from .dialogs.dialogs_food.dialog_with_calculate_norma_day import calculate_norma_day_dialog
 from .dialogs.dialog_with_workout import workout_dialog
 from .dialogs.dialogs_food.dialog_with_day_menu import day_menu_dialog
-from .dialogs.dialogs_admin.dialog_with_admin_user import admin_starting_dialog
+from .dialogs.dialogs_admin.dialog_with_admin_user import (
+    admin_starting_dialog, 
+)
 from .dialogs.dialogs_admin.dialog_with_content import content_dialog
 from .dialogs.dialogs_admin.dialog_with_users_groups import (
     users_groups_dialog, 

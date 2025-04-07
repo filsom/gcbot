@@ -33,8 +33,14 @@ class NormaDay:
             norma_day["norma_day"].update({key: str(macros[key])})
         return norma_day
     
-    def asmessage(self) -> str:
-        return f"Бoт расчитал:\n{self.repr()}"
+    def to_html(self) -> str:
+        return (
+            f"<p><b>Бот посчитал:</b></p>"
+            f"<p><b>Ккал</b> - {self.kcal}</p>"
+            f"<p><b>Белки</b> - {self.macros.protein}</p>"
+            f"<p><b>Жиры</b> - {self.macros.fat}</p>"
+            f"<p><b>Углеводы</b> - {self.macros.carbs}</p>"
+        )
     
 
 @dataclass
@@ -45,14 +51,14 @@ class InputData:
     coefficient: D
     target_procent: D
 
-    def asmessage(self) -> str:
+    def to_html(self) -> str:
         return (
-            f"Пользователь ввел:\n"
-            f"Возраст - {self.age} лет\n"
-            f"Рост - {self.height} см\n"
-            f"Вес - {self.weight} кг\n"
-            f"Aктивность - {self.coefficient}\n"
-            f"Цель - {self.target_procent}\n"
+            f"<p><b>Пользователь ввел:</b></p>"
+            f"<p><b>Возраст</b> - {self.age} лет</p>"
+            f"<p><b>Рост</b> - {self.height} см</p>"
+            f"<p><b>Вес</b> - {self.weight} кг</p>"
+            f"<p><b>Aктивность кф.</b> - {abs(self.coefficient)}</p>"
+            f"<p><b>Цель кф.</b> - {abs(self.target_procent)}</p>"
         )
 
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal as D
 from uuid import UUID
 
@@ -6,7 +7,7 @@ from starlette.config import Config
 
 from gcbot.application import commands as cmd
 from gcbot.domain.model.day_menu import adjust_recipes, present_the_menu
-from gcbot.domain.model.history_message import make_history_message_with_norma_day, make_history_with_day_menu
+from gcbot.domain.model.history_message import HistoryMessage, make_history_message_with_norma_day, make_history_with_day_menu
 from gcbot.domain.model.norma_day import InputData, calculate_daily_norm
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.message_storage import MessageStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_storage import RecipeStorage
@@ -84,7 +85,7 @@ class UserService:
             )
             norma_day = calculate_daily_norm(input_data)
             await self.user_storage \
-                .update_user(
+                .update_user_with_id(
                     {"norma_kcal": norma_day.kcal}, 
                     command.user_id
                 )
@@ -101,5 +102,22 @@ class UserService:
     async def input_norma(self, user_id: int, norma_kcal: D):
         async with self.connection.begin():
             await self.user_storage \
-                .update_user({"norma_kcal": norma_kcal}, user_id)
+                .update_user_with_id({"norma_kcal": norma_kcal}, user_id)
             await self.connection.commit()
+
+    async def add_history_message(
+        self, 
+        sender_id: int, 
+        recipient_id: int,
+        text: str, 
+        message_id: int | None = None
+    ):
+        message = HistoryMessage(
+            sender_id,
+            recipient_id,
+            text,
+            datetime.now(),
+            message_id
+        )
+        await self.message_storage.add_message(message)
+        await self.connection.commit()

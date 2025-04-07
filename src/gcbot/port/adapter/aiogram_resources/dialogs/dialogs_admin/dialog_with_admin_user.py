@@ -1,6 +1,5 @@
-from aiogram_dialog import Dialog, ShowMode, Window
+from aiogram_dialog import Dialog, DialogManager, ShowMode, Window
 from aiogram_dialog.widgets import text, kbd
-
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import (
     AdminStartingDialog, 
     ContentDialog
@@ -38,6 +37,6 @@ admin_starting_dialog = Dialog(
             #     show_mode=ShowMode.EDIT,
             # ),
         ),
-        state=AdminStartingDialog.start
+        state=AdminStartingDialog.start,
     )
 )

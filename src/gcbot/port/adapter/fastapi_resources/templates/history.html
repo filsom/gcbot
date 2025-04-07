@@ -1,111 +1,137 @@
+<!-- templates/chat.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Чат в стиле Telegram</title>
+    <title>Чат с рецептами</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #f5f5f5;
             padding: 20px;
-            height: 100vh;
+            background-color: #f0f0f0;
         }
-
-        .chat-box {
-            max-width: 600px;
+        .chat-container {
+            max-width: 800px;
             margin: 0 auto;
-            background: #ffffff;
+            background: white;
             border-radius: 18px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            height: 85vh;
+            padding: 30px;
+            height: 1200px;
             overflow-y: auto;
-            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             position: relative;
-            display: flex;
-            flex-direction: column-reverse;
         }
-
         .message {
-            margin: 8px 0;
-            padding: 14px 20px;
-            border-radius: 24px;
-            max-width: none;
-            width: fit-content;
-            clear: both;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 20px;
+            max-width: 75%;
             line-height: 1.6;
-            font-size: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            word-wrap: break-word;
+            position: relative;
+            clear: both;
         }
 
-        .user1 {
-            background: #2CA5E0;
-            color: white;
-            float: right;
+        /* Стили для пользователя */
+        .user-message {
+            background: #d1e7dd;
+            border-bottom-left-radius: 4px;
+            margin-left: 0;
+            margin-right: auto;
+            float: left;
+            clear: both;
+        }
+
+        /* Стили для администратора */
+        .admin-message {
+            background: #e8f4ff;
+            border-bottom-right-radius: 4px;
             margin-left: auto;
             margin-right: 0;
-            border-bottom-right-radius: 6px;
-            max-width: 80%;
-            width: fit-content;
+            float: right;
+            clear: both;
         }
 
-        .user2 {
-            background: #ffffff;
-            color: #000000;
-            float: left;
-            margin-right: auto;
-            margin-left: 0;
-            border-bottom-left-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            max-width: 80%;
-            width: fit-content;
-        }
-
-        .user1 .timestamp {
-            color: white;
-            opacity: 0.9;
-            font-size: 12px;
+        .timestamp {
+            font-size: 0.9em;
+            color: #666;
             display: block;
-            margin-top: 4px;
+            margin-top: 10px;
             text-align: right;
         }
 
-        .user2 .timestamp {
-            color: #6a6a6a;
-            opacity: 0.9;
-            font-size: 12px;
-            display: block;
-            margin-top: 4px;
-            text-align: right;
+        /* Стили для встроенных элементов */
+        .message a {
+            color: #0d6efd;
+            text-decoration: underline;
+        }
+        
+        .message ul {
+            margin: 15px 0 0 25px;
+            padding: 0;
+        }
+        
+        .message li {
+            margin: 8px 0;
+        }
+        
+        .message b {
+            color: #0f5132;
+        }
+
+        /* Дополнительные стили для админских сообщений */
+        .admin-message .content {
+            color: #1a3c7b;
+        }
+
+        .admin-message .timestamp {
+            color: #4164a5;
         }
 
         .empty-message {
-            color: #8a8a8a;
-            font-style: italic;
             text-align: center;
-            padding: 20px;
-            font-size: 14px;
-            animation: fadeIn 0.5s ease-out;
+            color: #666;
+            margin: 50px auto;
+            font-style: italic;
+            font-size: 1.1em;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Треугольники-указатели */
+        .message:after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
         }
 
-        .message {
-            animation: fadeIn 0.3s ease-out;
+        .user-message:after {
+            left: 20px;
+            border-top-color: #d1e7dd;
+        }
+
+        .admin-message:after {
+            right: 20px;
+            border-top-color: #e8f4ff;
         }
     </style>
 </head>
-<body>
-    <div class="chat-box" id="chatBox">
+<body onload="scrollToBottom()">
+    <div class="chat-container" id="chatContainer">
         {% if messages %}
-            {% for msg in messages %}
-                <div class="message {% if msg.user == 'admin' %}user1{% else %}user2{% endif %}">
-                    <div>{{ msg.text }}</div>
-                    <span class="timestamp">{{ msg.time }}</span>
+            {% for msg in messages|sort(attribute='time') %}
+            <div class="message {{ msg.user }}-message">
+                <div class="content">
+                    {% if msg.user == 'admin' %}
+                        {{ msg.text | safe }}
+                    {% else %}
+                        {{ msg.text }}
+                    {% endif %}
                 </div>
+                <span class="timestamp">{{ msg.time }}</span>
+            </div>
             {% endfor %}
         {% else %}
             <div class="empty-message">История сообщений пуста</div>
@@ -113,16 +139,10 @@
     </div>
 
     <script>
-        function formatTime(dateString) {
-            const date = new Date(dateString);
-            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        function scrollToBottom() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTop = container.scrollHeight;
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.timestamp').forEach(ts => {
-                ts.textContent = formatTime(ts.textContent);
-            });
-        });
     </script>
 </body>
 </html>

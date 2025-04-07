@@ -52,7 +52,10 @@ class UserQueryService:
         user_data = await self.user_fetcher \
             .fetch_user_and_groups_with_id(user_id)
         if user_data["groups"]:
-            user_data.update({"dialog_state": PaidStartingDialog.start})
+            if Group.ADMIN in user_data["groups"]:
+                user_data.update({"dialog_state": AdminStartingDialog.start})
+            else:
+                user_data.update({"dialog_state": PaidStartingDialog.start})
         else:
             last_workout = await self.workout_fetcher \
                 .fetch_last_workout()
@@ -72,7 +75,6 @@ class UserQueryService:
     async def query_user_section(self, user_id: int, group_id: int) -> dict:
         user_data = await self.user_fetcher \
             .fetch_user_and_groups_with_id(user_id)
-        print(user_data)
         if group_id in user_data["groups"] or Group.ADMIN in user_data["groups"]:
             if group_id == Group.FOOD:
                 dialog_state = FoodDialog.start
@@ -116,9 +118,39 @@ class UserQueryService:
         return await self.recipe_fetcher \
             .fetch_partial_recipe_with_type_meal(type_meal)
     
-    async def query_user_for_admin(self, email: str) -> dict:
+    async def query_user_for_admin_with_email(self, email: str) -> dict:
         user_data = await self.user_fetcher \
             .fetch_user_and_groups_with_email(email)
+        return await self.parse_user_data_for_admin(user_data)
+    
+    async def query_user_for_admin_with_id(self, user_id) -> dict:
+        user_data = await self.user_fetcher \
+            .fetch_user_and_groups_with_id(user_id)
+        return await self.parse_user_data_for_admin(user_data)
+    
+    async def query_forwarding_data(self, user_id: int, text_message: str) -> dict:
+        user_data = await self.query_user_for_admin_with_id(user_id)
+        return await self.make_preview_text(user_data, user_id, text_message)
+    
+    async def make_preview_text(self, user_data: dict, user_id: int, text_message: str) -> dict:
+        forwarding_data = {}
+        if not user_data:
+            text = (
+                f"👤 id {user_id}\n"
+                f"Сообщение:\n{text_message}"
+            )
+        else:
+            text = (
+                f"👤 id {user_id}\n"
+                f"📧 @email: {user_data["current_email"]}\n"
+                f"👥 GC группы: {user_data["alias_groups"]}\n"
+                f"Сообщение:\n{text_message}"
+            )
+            forwarding_data.update({"profile": True})
+        forwarding_data.update({"previw_text": text})
+        return forwarding_data
+
+    async def parse_user_data_for_admin(self, user_data: dict | None) -> dict:
         if user_data is None:
             return {}
         email = user_data.pop("email")
@@ -149,5 +181,4 @@ class UserQueryService:
         user_data.update({
             "alias_groups": alias,
         }) 
-        print(user_data)
         return user_data

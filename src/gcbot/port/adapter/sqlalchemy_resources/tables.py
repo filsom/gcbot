@@ -101,5 +101,6 @@ messages_table = sa.Table(
     sa.Column('sender_id', sa.BigInteger, nullable=False),
     sa.Column('recipient_id', sa.BigInteger, nullable=False),
     sa.Column('text', sa.String(4000), nullable=False),
-    sa.Column('sent_to', sa.DateTime, nullable=False)
+    sa.Column('sent_to', sa.DateTime, nullable=False),
+    sa.Column('message_id', sa.BigInteger, nullable=True),
 )

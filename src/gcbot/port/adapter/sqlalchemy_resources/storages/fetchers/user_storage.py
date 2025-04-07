@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncConnection
-
+from sqlalchemy.dialects.postgresql import insert
 from gcbot.port.adapter.sqlalchemy_resources.tables import users_table, groups_table
 
 
@@ -10,12 +10,13 @@ class UserStorage:
 
     async def add_user(self, user_id: int, email: str):
         insert_stmt = (
-            sa.insert(users_table)
+            insert(users_table)
             .values(
                 user_id=user_id,
                 email=email
             )
         )
+        insert_stmt = insert_stmt.on_conflict_do_nothing()
         await self.connection.execute(insert_stmt)
 
     async def insert_user_in_group(self, email: str, group_id: int):

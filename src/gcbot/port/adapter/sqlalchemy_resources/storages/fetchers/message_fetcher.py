@@ -29,7 +29,7 @@ class MessageJsonFetcher:
                             "text", messages_table.c.text,
                             "sent_to", messages_table.c.sent_to,
                         ),
-                        sa.desc(messages_table.c.sent_to)
+                        sa.asc(messages_table.c.sent_to)
                     )
                 )
             )

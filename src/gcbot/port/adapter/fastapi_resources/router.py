@@ -38,6 +38,7 @@ async def get_history_message_with_user(
 ):
     history_data = await message_fetcher \
         .fetch_message_with_user(user_id)
+    print(history_data)
     return templates.TemplateResponse(
         request,
         "history.html",
