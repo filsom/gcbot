@@ -1,8 +1,8 @@
 from decimal import Decimal as D
 import operator
 
-from aiogram import types as t
-from aiogram_dialog import Dialog, DialogManager, Window
+from aiogram import Bot, types as t
+from aiogram_dialog import Dialog, DialogManager, ShowMode, Window
 from aiogram_dialog.widgets import text, kbd
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
@@ -14,6 +14,7 @@ from gcbot.port.adapter.aiogram_resources.dialogs.widgets import (
     DailyNormResultWindow, 
     NormaDayTextInput
 )
+from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
 
 
 async def get_data_targets(**kwargs):
@@ -65,15 +66,21 @@ async def get_result_calculated_values(dialog_manager: DialogManager, **kwargs):
     return dialog_manager.dialog_data["norma_day"]
 
 
+@inject
 async def selected_coefficient(
     callback: t.CallbackQuery, 
     widget, 
     dialog_manager: DialogManager, 
     item_id,
+    query_service: FromDishka[UserQueryService]
 ):
-    # Если 1, то отправить войс
-    dialog_manager.dialog_data["coefficient"] = item_id
-    await dialog_manager.next()
+    if item_id == "1":
+        file_id = await query_service.query_video_note()
+        await callback.message.answer_video_note(file_id)
+        dialog_manager.show_mode = ShowMode.DELETE_AND_SEND
+    else:
+        dialog_manager.dialog_data["coefficient"] = item_id
+        await dialog_manager.next()
 
 
 calculate_norma_day_dialog = Dialog(

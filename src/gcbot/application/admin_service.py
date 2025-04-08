@@ -1,10 +1,14 @@
+from uuid import uuid4
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncConnection
 from gspread import Worksheet
 
+from gcbot.domain.model.content import Media
 from gcbot.domain.model.day_menu import parse_recipe
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_storage import RecipeStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_storage import UserStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_storage import WorkoutStorage
+from gcbot.port.adapter.sqlalchemy_resources.tables import medias_table
 
 
 class AdminService:
@@ -21,7 +25,6 @@ class AdminService:
         self.user_storage = user_storage
         self.recipe_storage = recipe_storage
         self.workout_storage = workout_storage
-
 
     async def add_user_in_group(self, email: str, group_id: int) -> None:
         async with self.connection.begin():
@@ -51,4 +54,21 @@ class AdminService:
                     recipe = parse_recipe(record)
                     unload_recipes.append(recipe)
                 await self.recipe_storage.add_all(unload_recipes)
+            await self.connection.commit()
+
+    async def set_support_voice(self, voice: Media) -> None:
+        async with self.connection.begin():
+            inset_stmt = (
+                sa.insert(medias_table)
+                .values(
+                    media_id=uuid4(),
+                    entity_id=uuid4(),
+                    entity_type="support",
+                    file_id=voice.file_id,
+                    file_unique_id=voice.file_unique_id,
+                    message_id=voice.message_id,
+                    content_type=voice.content_type
+                )
+            )
+            await self.connection.execute(inset_stmt)
             await self.connection.commit()

@@ -50,53 +50,60 @@ async def on_click_confirm_email_address(
     user_service: FromDishka[UserService],
     query_service: FromDishka[UserQueryService]
 ):
-    await user_service.create_user(
-        callback.from_user.id,
-        dialog_manager.dialog_data["email"]
-    )
-    query_result = await query_service \
-        .query_confirm_email_address(callback.from_user.id)
-    workout = query_result.get("workout")
-    if workout is not None:
-        bot: Bot = dialog_manager.middleware_data["bot"]
-        bg_manager = dialog_manager.bg(user_id=callback.from_user.id)
-        asyncio.create_task(
-            send_last_workout(
-                callback.from_user.id,
-                query_result["dialog_state"],
-                bg_manager,
-                bot,
-                workout
-            )
-        )
-        parsed_data = await query_service \
-            .parse_user_data_for_admin(query_result)
-        forward_data = await query_service.make_preview_text(
-            parsed_data,
+    try:
+        await user_service.create_user(
             callback.from_user.id,
             dialog_manager.dialog_data["email"]
         )
-        builder = InlineKeyboardBuilder()
-        if forward_data.get("profile", False):
-            builder.button(text="Профиль", callback_data="user_profile_from_admin")
-        forward_message = await bot.send_message(
-            user_service.config.get("ADMIN_ID"),
-            forward_data["previw_text"],
-            reply_markup=builder.as_markup()
+    except ValueError:
+        await callback.message.answer("Некорректный @email адресс ❌")
+        await dialog_manager.back(
+            show_mode=ShowMode.DELETE_AND_SEND
         )
-        await user_service.add_history_message(
-            callback.from_user.id,
-            user_service.config.get("ADMIN_ID"),
-            dialog_manager.dialog_data["email"],
-            forward_message.message_id
-        )
-        await dialog_manager.next()
     else:
-        await dialog_manager.start(
-            query_result["dialog_state"],
-            mode=StartMode.RESET_STACK,
-            show_mode=ShowMode.EDIT
-        )
+        query_result = await query_service \
+            .query_confirm_email_address(callback.from_user.id)
+        workout = query_result.get("workout")
+        if workout is not None:
+            bot: Bot = dialog_manager.middleware_data["bot"]
+            bg_manager = dialog_manager.bg(user_id=callback.from_user.id)
+            asyncio.create_task(
+                send_last_workout(
+                    callback.from_user.id,
+                    query_result["dialog_state"],
+                    bg_manager,
+                    bot,
+                    workout
+                )
+            )
+            parsed_data = await query_service \
+                .parse_user_data_for_admin(query_result)
+            forward_data = await query_service.make_preview_text(
+                parsed_data,
+                callback.from_user.id,
+                dialog_manager.dialog_data["email"]
+            )
+            builder = InlineKeyboardBuilder()
+            if forward_data.get("profile", False):
+                builder.button(text="Профиль", callback_data="user_profile_from_admin")
+            forward_message = await bot.send_message(
+                user_service.config.get("ADMIN_ID"),
+                forward_data["previw_text"],
+                reply_markup=builder.as_markup()
+            )
+            await user_service.add_history_message(
+                callback.from_user.id,
+                user_service.config.get("ADMIN_ID"),
+                dialog_manager.dialog_data["email"],
+                forward_message.message_id
+            )
+            await dialog_manager.next()
+        else:
+            await dialog_manager.start(
+                query_result["dialog_state"],
+                mode=StartMode.RESET_STACK,
+                show_mode=ShowMode.EDIT
+            )
     
 
 anon_starting_dialog = Dialog(

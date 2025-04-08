@@ -60,7 +60,7 @@ class WorkoutStorage:
             media.update({
                 "media_id": uuid4(),
                 "entity_id": workout_id,
-                "entity_type":EntityType.WORKOUT
+                "entity_type": EntityType.WORKOUT
             })
         insert_medias = (
             sa.insert(medias_table)

@@ -1,3 +1,5 @@
+import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncConnection
 from aiogram.fsm.state import State
 from starlette.config import Config
 
@@ -13,6 +15,7 @@ from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_food.dialog_state impo
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_json_fetcher import RecipeJsonFetcher
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_json_fetcher import UserJsonFetcher
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_json_fetcher import WorkoutJsonFetcher
+from gcbot.port.adapter.sqlalchemy_resources.tables import medias_table
 
 
 class Group(object):
@@ -25,11 +28,13 @@ class UserQueryService:
     def __init__(
         self, 
         config: Config,
+        connection: AsyncConnection,
         user_fetcher: UserJsonFetcher,
         workout_fetcher: WorkoutJsonFetcher,
         recipe_fetcher: RecipeJsonFetcher
     ) -> None:
         self.config = config
+        self.connection = connection
         self.user_fetcher = user_fetcher
         self.workout_fetcher = workout_fetcher
         self.recipe_fetcher = recipe_fetcher
@@ -182,3 +187,13 @@ class UserQueryService:
             "alias_groups": alias,
         }) 
         return user_data
+    
+    async def query_video_note(self) -> str:
+        query = (
+            sa.select(medias_table.c.file_id)
+            .where(medias_table.c.content_type == "video_note")
+            .order_by(sa.desc(medias_table.c.message_id))
+            .limit(1)
+        )
+        result = (await self.connection.execute(query)).scalar()
+        return result

@@ -16,8 +16,21 @@ class UserStorage:
                 email=email
             )
         )
-        insert_stmt = insert_stmt.on_conflict_do_nothing()
+        # insert_stmt = insert_stmt.on_conflict_do_nothing()
         await self.connection.execute(insert_stmt)
+
+    async def with_id_or_email(self, user_id: int, email: str):
+        stmt = (
+            sa.select(users_table.c.user_id)
+            .where(
+                sa.or_(
+                    users_table.c.user_id == user_id,
+                    users_table.c.email == email
+                )
+            )
+        )
+        result = (await self.connection.execute(stmt)).scalar()
+        return result
 
     async def insert_user_in_group(self, email: str, group_id: int):
         insert_stmt = (

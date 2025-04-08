@@ -40,7 +40,13 @@ async def _send_expiring_notification(message: t.Message):
 
 class HistoryMessageFilter(f.Filter):
     @inject
-    async def __call__(self, message: t.Message, config: FromDishka[Config]) -> bool:
+    async def __call__(
+        self, 
+        message: t.Message, 
+        config: FromDishka[Config]
+    ) -> bool:
+        if message.text is None:
+            return False
         if message.text.startswith("/"):
             return False
         entities = message.entities or message.caption_entities
@@ -61,7 +67,11 @@ class HistoryMessageFilter(f.Filter):
 
 @starting_router.message(F.reply_to_message)
 @inject
-async def reply_to_user(message: t.Message, service: FromDishka[UserService], storage: FromDishka[MessageStorage]):
+async def reply_to_user(
+    message: t.Message, 
+    service: FromDishka[UserService], 
+    storage: FromDishka[MessageStorage]
+):
     recipient_id = await storage \
         .get_recipient_id_by_message_id(
             message.reply_to_message.message_id

@@ -34,7 +34,6 @@ class UserService:
 
     async def add_workout_to_favorites(self, user_id: int, workout_id: UUID) -> None:
         async with self.connection.begin():
-            
             await self.workout_storage \
                 .put_like(user_id, workout_id)
             await self.connection.commit()
@@ -71,6 +70,10 @@ class UserService:
 
     async def create_user(self, user_id: int, email: str):
         async with self.connection.begin():
+            exists_user_id = await self.user_storage \
+                .with_id_or_email(user_id, email)
+            if exists_user_id is not None:
+                raise ValueError
             await self.user_storage.add_user(user_id, email)
             await self.connection.commit()
 

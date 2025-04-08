@@ -8,12 +8,12 @@ from .dialogs.dialogs_food.dialog_with_calculate_norma_day import calculate_norm
 from .dialogs.dialog_with_workout import workout_dialog
 from .dialogs.dialogs_food.dialog_with_day_menu import day_menu_dialog
 from .dialogs.dialogs_admin.dialog_with_admin_user import (
-    admin_starting_dialog, 
+    admin_starting_dialog,
 )
-from .dialogs.dialogs_admin.dialog_with_content import content_dialog
+from .dialogs.dialogs_admin.dialog_with_content import content_dialog, set_voice_dialog
 from .dialogs.dialogs_admin.dialog_with_users_groups import (
     users_groups_dialog, 
-    add_user_group_dialog
+    add_user_group_dialog,
 )
 
 
@@ -29,3 +29,4 @@ starting_router.include_router(admin_starting_dialog)
 starting_router.include_router(content_dialog)
 starting_router.include_router(users_groups_dialog)
 starting_router.include_router(add_user_group_dialog)
+starting_router.include_router(set_voice_dialog)

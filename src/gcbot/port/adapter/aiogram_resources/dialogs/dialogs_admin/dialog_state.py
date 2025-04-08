@@ -11,3 +11,6 @@ class UsersGroupsDialog(StatesGroup):
 
 class AddUserInGroupDialog(StatesGroup):
     start = State()
+
+class AddVoiceDialog(StatesGroup):
+    start = State()
