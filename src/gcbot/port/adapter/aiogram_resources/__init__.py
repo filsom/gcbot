@@ -10,11 +10,16 @@ from .dialogs.dialogs_food.dialog_with_day_menu import day_menu_dialog
 from .dialogs.dialogs_admin.dialog_with_admin_user import (
     admin_starting_dialog,
 )
+from .dialogs.dialogs_admin.dialog_with_upload_media import upload_media_dialog
 from .dialogs.dialogs_admin.dialog_with_content import content_dialog, set_voice_dialog
+from .dialogs.dialogs_admin.dialog_with_new_workout import new_workout_dialog
 from .dialogs.dialogs_admin.dialog_with_users_groups import (
     users_groups_dialog, 
     add_user_group_dialog,
 )
+from .dialogs.dialogs_admin.mailing.dialog_with_send_mailing import send_mailings_dialog
+from .dialogs.dialogs_admin.mailing.dialog_with_mailings import mailing_dialog
+from .dialogs.dialogs_admin.mailing.dialog_with_planed_mailing import planed_mailling_dialog
 
 
 starting_router.include_router(anon_starting_dialog)
@@ -30,3 +35,8 @@ starting_router.include_router(content_dialog)
 starting_router.include_router(users_groups_dialog)
 starting_router.include_router(add_user_group_dialog)
 starting_router.include_router(set_voice_dialog)
+starting_router.include_router(new_workout_dialog)
+starting_router.include_router(upload_media_dialog)
+starting_router.include_router(send_mailings_dialog)
+starting_router.include_router(mailing_dialog)
+starting_router.include_router(planed_mailling_dialog)

@@ -61,7 +61,6 @@ async def on_click_add_user_in_groups(
     )
 
 
-
 @inject
 async def on_click_selected_group(
     callback: t.CallbackQuery,

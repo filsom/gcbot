@@ -14,8 +14,10 @@ from starlette.config import Config
 
 from gcbot.application.admin_service import AdminService
 from gcbot.application.user_service import UserService
+from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.mailing.mailing_service import TelegramMailingService
 from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
 from gcbot.port.adapter.aiogram_resources.query_services.workout_query_service import WorkoutQueryService
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.mailing_storage import MailingStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.message_storage import MessageStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_json_fetcher import RecipeJsonFetcher
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_storage import RecipeStorage
@@ -89,3 +91,5 @@ class TelegramBotProvider(Provider):
     recipe_fetcher = provide(RecipeJsonFetcher, scope=Scope.REQUEST)
     admin_service = provide(AdminService, scope=Scope.REQUEST)
     message_storage = provide(MessageStorage, scope=Scope.REQUEST)
+    mailing_service = provide(TelegramMailingService, scope=Scope.REQUEST)
+    mailing_storage = provide(MailingStorage, scope=Scope.REQUEST)

@@ -104,3 +104,14 @@ messages_table = sa.Table(
     sa.Column('sent_to', sa.DateTime, nullable=False),
     sa.Column('message_id', sa.BigInteger, nullable=True),
 )
+
+
+mailing_table = sa.Table(
+    "mailings",
+    metadata,
+    sa.Column('mailing_id', sa.UUID, primary_key=True, nullable=False),
+    sa.Column('text', sa.String(4000), nullable=False),
+    sa.Column('name', sa.String(128), nullable=True),
+    sa.Column('type_recipient', sa.Integer, nullable=False),
+    sa.Column('status', sa.String(20), nullable=False),
+)

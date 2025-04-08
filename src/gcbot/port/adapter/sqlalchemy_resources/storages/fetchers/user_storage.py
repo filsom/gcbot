@@ -72,6 +72,17 @@ class UserStorage:
         )
         await self.connection.execute(update_stmt)
 
+    async def all_user_id(self, is_exists: bool = False) -> list[int]:
+        stmt = sa.select(users_table.c.user_id).where()
+        subq_stmt = sa.select(groups_table.c.email)
+        if not is_exists:
+            stmt = stmt.where(users_table.c.email.not_in(subq_stmt))
+        else:
+            stmt = stmt.where(users_table.c.email.in_(subq_stmt))
+
+        result = await self.connection.execute(stmt)
+        return result.scalars().all()
+
     def _update(self, values: dict):
         update_stmt = (
             sa.update(users_table)

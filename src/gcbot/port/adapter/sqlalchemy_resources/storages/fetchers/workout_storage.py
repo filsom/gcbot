@@ -9,7 +9,8 @@ from gcbot.port.adapter.sqlalchemy_resources.tables import (
     EntityType,
     like_workouts_table, 
     workouts_table, 
-    medias_table
+    medias_table,
+    categories_table
 )
 
 
@@ -38,7 +39,7 @@ class WorkoutStorage:
         )
         await self.connection.execute(delete_stmt)
 
-    async def add_training(
+    async def add_workout(
         self,
         category_id: UUID,
         text: str,
@@ -67,3 +68,13 @@ class WorkoutStorage:
             .values(medias)
         )
         await self.connection.execute(insert_medias)
+
+    async def add_category(self, name: str):
+        insert_stmt = (
+            sa.insert(categories_table)
+            .values(
+                category_id=uuid4(),
+                name=name
+            )
+        )
+        await self.connection.execute(insert_stmt)

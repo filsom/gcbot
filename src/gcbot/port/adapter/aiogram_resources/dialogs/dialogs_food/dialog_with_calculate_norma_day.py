@@ -87,7 +87,7 @@ calculate_norma_day_dialog = Dialog(
     Window(
         text.Const(
             "Напишите ваш текущий вес в кг.\n"
-            "Пришлите только цифры, например, 72👇"
+            "Пришлите только цифры, например, <b>72</b>👇"
         ),
         NormaDayTextInput("input_weight"),
         state=CalculateNormaDayDialog.start
@@ -95,7 +95,7 @@ calculate_norma_day_dialog = Dialog(
     Window(
         text.Const(
             "Введите ваш рост в см.\n"
-            "Пришлите только цифры, например, 165👇"
+            "Пришлите только цифры, например, <b>165</b>👇"
         ),
         NormaDayTextInput("input_hieght"),
         state=CalculateNormaDayDialog.hieght
@@ -103,7 +103,7 @@ calculate_norma_day_dialog = Dialog(
     Window(
         text.Const(
             "Напишите ваш возраст (лет).\n"
-            "Пришлите только цифры, например, 35👇"
+            "Пришлите только цифры, например, <b>35</b>👇"
         ),
         NormaDayTextInput("input_age"),
         state=CalculateNormaDayDialog.age

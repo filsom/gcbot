@@ -85,7 +85,7 @@ async def reply_to_user(
     await message.copy_to(recipient_id)
     await message.reply_to_message.delete()
     await message.delete()
-        
+
 
 @starting_router.message(HistoryMessageFilter())
 @inject

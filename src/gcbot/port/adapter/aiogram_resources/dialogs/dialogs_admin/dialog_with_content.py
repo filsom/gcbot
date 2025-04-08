@@ -1,6 +1,6 @@
 from aiogram import types as t
 from aiogram.enums import ContentType
-from aiogram_dialog import Dialog, DialogManager, ShowMode, Window
+from aiogram_dialog import Dialog, DialogManager, ShowMode, StartMode, Window
 from aiogram_dialog.widgets import text, kbd, input
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
@@ -8,7 +8,8 @@ from dishka.integrations.aiogram_dialog import inject
 from gcbot.application.admin_service import AdminService
 from gcbot.domain.model.content import Media
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import ContentDialog
-from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.dialog_state import AddVoiceDialog
+from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.dialog_state import AddVoiceDialog, NewTrainingDialog
+from gcbot.port.adapter.aiogram_resources.dialogs.widgets import BackAdminPanel
 
 
 @inject
@@ -34,17 +35,29 @@ async def on_click_unload_from_google_sheet(
     await service.unload_from_google_sheet()
     callback.message.answer("Рецепты успешно выгружены ✅")
 
+
+async def on_add_training(
+    callback: t.CallbackQuery,
+    button,
+    dialog_manager: DialogManager,
+):
+    await dialog_manager.start(
+        NewTrainingDialog.start,
+        show_mode=ShowMode.EDIT,
+        mode=StartMode.NORMAL,
+        data={"from_training": True}
+    )
 
 
 content_dialog = Dialog(
     Window(
         text.Const("Управление контентом бота ⭐️"),
         kbd.Column(
-            # kbd.Button(
-            #     text.Const("Добавить тренировку"),
-            #     id="add_training",
-            #     on_click=Clicker.on_add_training,
-            # ),
+            kbd.Button(
+                text.Const("Добавить тренировку"),
+                id="add_new_workout",
+                on_click=on_add_training,
+            ),
             # kbd.Start(
             #     text.Const("Добавить категорию"),
             #     id="add_category",
@@ -99,6 +112,7 @@ set_voice_dialog = Dialog(
             voice_handler,
             content_types=ContentType.VIDEO_NOTE
         ),
+        BackAdminPanel(),
         state=AddVoiceDialog.start
     )
 )

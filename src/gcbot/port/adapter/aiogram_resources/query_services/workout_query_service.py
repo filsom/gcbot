@@ -13,8 +13,8 @@ class WorkoutQueryService:
 
     async def query_categories_names(
         self, 
-        user_id: int, 
-        from_favorites: bool
+        user_id: int = None, 
+        from_favorites: bool = False
     ) -> dict:
         if from_favorites:
             return await self.workout_fetcher \
