@@ -80,6 +80,4 @@ def create_app():
     setup_dishka(app_container, app)
     return app
 
-
-if __name__ == "__main__":
-    uvicorn.run(create_app(), port=8000, lifespan="on")
+app = create_app()
