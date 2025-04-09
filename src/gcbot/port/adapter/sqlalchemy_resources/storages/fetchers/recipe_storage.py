@@ -94,5 +94,12 @@ class RecipeStorage:
         await self.connection.execute(insert_recipes_stmt)
         await self.connection.execute(insert_ingredients_stmt)
         
-    async def count(self):
-        pass
+    async def count(self) -> int:
+        stmt = (
+            sa.select(sa.func.count())
+            .select_from(recipes_table)
+        )
+        result = (await self.connection.execute(stmt)).scalar()
+        if result is None:
+            return 0
+        return result

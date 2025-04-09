@@ -50,6 +50,7 @@ class AdminService:
     async def unload_from_google_sheet(self) -> None:
         async with self.connection.begin():
             head = await self.recipe_storage.count()
+            print(head)
             records = self.worksheet.get_all_records()[head:]
             if records:
                 unload_recipes = []
@@ -86,41 +87,3 @@ class AdminService:
         async with self.connection.begin():
             await self.workout_storage.add_category(name)
             await self.connection.commit()
-
-    # async def create_task_mailing(self, mailing_id: UUID):
-    #     async with self.session.begin():
-    #         active_mailing = await self.gateway \
-    #             .count_with_status(StatusMailing.PROCESS)
-    #         if active_mailing:
-    #             await self.session.rollback()
-    #             raise ValueError
-            
-    #         mailing = await self.gateway \
-    #             .query_mailing_with_id(mailing_id)
-    #         if mailing["type_recipient"] in [
-    #             RecipientMailing.FREE, RecipientMailing.TRAINING
-    #         ]:
-    #             is_exists = False
-    #         else:
-    #             is_exists = True
-    #         recipiens_ids = await self.gateway \
-    #             .query_all_user_id_with_role(is_exists=is_exists)
-            
-    #         kbd = None
-    #         if mailing["type_recipient"] == RecipientMailing.TRAINING:
-    #             builder = InlineKeyboardBuilder()
-    #             builder.button(text="Все тренировки", callback_data="from_mailing")
-    #             kbd = builder.as_markup(resize_keyboard=True)
-    #         task = partial(
-    #             send_mailing_message, 
-    #             users_ids=recipiens_ids, 
-    #             mailing_id=mailing_id,
-    #             mailing_media=mailing["media"], 
-    #             mailing_text=mailing["text"],
-    #             kbd=kbd
-    #         )
-    #         await self.gateway.update_status_mailing(
-    #             mailing_id, StatusMailing.PROCESS
-    #         )
-    #         await self.session.commit()
-    #         return task

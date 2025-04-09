@@ -140,8 +140,8 @@ def parse_recipe(data: dict[str, str]):
     }
     return Recipe(
         data["id"],
-        data["name"].strip()[0].title(),
-        data["recipe"].strip(),
+        data["name"].strip().capitalize(),
+        data["recipe"].strip().capitalize(),
         data["photo"],
         data["kkal"],
         TYPE_MAP.get(data["type"].lower()),

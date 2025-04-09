@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncIterable
 
@@ -9,6 +10,7 @@ from dishka.integrations.fastapi import setup_dishka
 from dishka import Provider, Scope, from_context, make_async_container, provide
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncConnection
 
+from gcbot.port.adapter.parse_gc import parse_gc
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.message_fetcher import MessageJsonFetcher
 from gcbot.port.adapter.sqlalchemy_resources.tables import metadata
 from gcbot.port.adapter.fastapi_resources.router import router
@@ -47,6 +49,7 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as connection:
         await connection.run_sync(metadata.create_all)
         await connection.commit()
+    # asyncio.create_task(parse_gc(engine))
     yield
     await bot.delete_webhook()
     await bot.session.close()

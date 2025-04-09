@@ -34,7 +34,7 @@ like_workouts_table = sa.Table(
    'like_workouts',
     metadata,
     sa.Column('like_id', sa.UUID, default=uuid4, primary_key=True, nullable=False),
-    sa.Column('workout_id', sa.ForeignKey('workouts.workout_id'), nullable=False),
+    sa.Column('workout_id', sa.ForeignKey('workouts.workout_id', ondelete="CASCADE"), nullable=False),
     sa.Column('user_id', sa.ForeignKey('users.user_id'), nullable=False),
 )
 
@@ -87,7 +87,7 @@ ingredients_table = sa.Table(
     'ingredients',
     metadata,
     sa.Column('oid', sa.BigInteger, primary_key=True, autoincrement=True, nullable=False),
-    sa.Column('recipe_id', sa.ForeignKey('recipes.recipe_id'), nullable=False),
+    sa.Column('recipe_id', sa.ForeignKey('recipes.recipe_id', ondelete="CASCADE"), nullable=False),
     sa.Column('name', sa.String(500), nullable=False),
     sa.Column('value', sa.DECIMAL(20, 0), nullable=False),
     sa.Column('unit', sa.String, nullable=False),

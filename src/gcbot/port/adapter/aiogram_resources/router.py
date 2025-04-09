@@ -65,7 +65,19 @@ class HistoryMessageFilter(f.Filter):
             return True
         
 
-@starting_router.message(F.reply_to_message)
+class HistoryMessageAnswer(f.Filter):
+    @inject
+    async def __call__(self, message: t.Message, config: FromDishka[Config]):
+        if message.from_user.id == int(config.get("ADMIN_ID")):
+            if message.reply_to_message is None:
+                return False
+            elif F.reply_to_message:
+                return True
+        return False    
+        
+
+
+@starting_router.message(HistoryMessageAnswer())
 @inject
 async def reply_to_user(
     message: t.Message, 
