@@ -87,3 +87,8 @@ class AdminService:
         async with self.connection.begin():
             await self.workout_storage.add_category(name)
             await self.connection.commit()
+
+    async def delete_category(self, category_id: UUID):
+        async with self.connection.begin():
+            await self.workout_storage.delete_category(category_id)
+            await self.connection.commit()

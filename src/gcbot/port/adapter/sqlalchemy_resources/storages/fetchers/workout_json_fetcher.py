@@ -30,7 +30,7 @@ class WorkoutJsonFetcher:
         query = (
             sa.select(
                 categories_table.c.name, 
-                categories_table.c.category_id
+                sa.cast(categories_table.c.category_id, sa.String)
                 )
             .select_from(categories_table)
             .where(categories_table.c.category_id.in_(sub_query))
@@ -51,7 +51,7 @@ class WorkoutJsonFetcher:
         query = (
             sa.select(
                 categories_table.c.name, 
-                categories_table.c.category_id
+                sa.cast(categories_table.c.category_id, sa.String)
             )
         )
         rows = await self.connection.execute(query)

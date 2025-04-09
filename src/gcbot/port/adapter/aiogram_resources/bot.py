@@ -11,6 +11,7 @@ from dishka import AsyncContainer, make_async_container, Provider, from_context,
 from dishka.integrations.aiogram import AiogramProvider, setup_dishka
 from gspread import Worksheet, service_account
 from starlette.config import Config
+from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
 
 from gcbot.application.admin_service import AdminService
 from gcbot.application.user_service import UserService
@@ -53,7 +54,8 @@ def create_bot_container(
 
 
 def create_dispatcher(container: AsyncContainer):
-    storage = MemoryStorage()
+    storage = RedisStorage.from_url("redis://somov:somov228@localhost:6380/0")
+    storage.key_builder = DefaultKeyBuilder(with_destiny=True)
     dp = Dispatcher(
         storage=storage, 
         events_isolation=SimpleEventIsolation()

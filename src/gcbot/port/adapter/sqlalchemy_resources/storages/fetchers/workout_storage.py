@@ -1,6 +1,6 @@
 from datetime import datetime
 from uuid import UUID, uuid4
-
+from copy import deepcopy
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.dialects.postgresql import insert
@@ -46,6 +46,7 @@ class WorkoutStorage:
         medias: list
     ):
         workout_id = uuid4()
+        storage_medias = deepcopy(medias)
         insert_training = (
             sa.insert(workouts_table)
             .values(
@@ -57,7 +58,7 @@ class WorkoutStorage:
             )
         )
         await self.connection.execute(insert_training)
-        for media in medias:
+        for media in storage_medias:
             media.update({
                 "media_id": uuid4(),
                 "entity_id": workout_id,
@@ -65,7 +66,7 @@ class WorkoutStorage:
             })
         insert_medias = (
             sa.insert(medias_table)
-            .values(medias)
+            .values(storage_medias)
         )
         await self.connection.execute(insert_medias)
 
@@ -78,3 +79,10 @@ class WorkoutStorage:
             )
         )
         await self.connection.execute(insert_stmt)
+
+    async def delete_category(self, category_id: UUID):
+        delete_stmt = (
+            sa.delete(categories_table)
+            .where(categories_table.c.category_id == category_id)
+        )
+        await self.connection.execute(delete_stmt)

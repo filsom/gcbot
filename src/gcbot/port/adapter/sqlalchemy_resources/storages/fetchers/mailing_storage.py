@@ -1,3 +1,4 @@
+from copy import deepcopy
 from uuid import UUID, uuid4
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncConnection
@@ -59,6 +60,7 @@ class MailingStorage:
         type_recipient: int,
         status: str
     ):
+        storage_medias = deepcopy(medias)
         insert_mailing = (
             sa.insert(mailing_table)
             .values(
@@ -69,7 +71,7 @@ class MailingStorage:
                 status=status
             )
         )
-        for media in medias:
+        for media in storage_medias:
             media.update({
                 "media_id": uuid4(),
                 "entity_id": mailing_id,
@@ -78,7 +80,7 @@ class MailingStorage:
         await self.connection.execute(insert_mailing)
         insert_medias = (
             sa.insert(medias_table)
-            .values(medias)
+            .values(storage_medias)
         )
         await self.connection.execute(insert_medias)
 

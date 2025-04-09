@@ -41,15 +41,16 @@ async def lifespan(app: FastAPI):
     bot: Bot = await app.state.dishka_container.get(Bot)
     dp: Dispatcher = await app.state.dishka_container.get(Dispatcher)
     engine: AsyncEngine = await app.state.bot_container.get(AsyncEngine)
+    async with engine.begin() as connection:
+        await connection.run_sync(metadata.create_all)
+        await connection.commit()
+
     await bot.set_webhook(
         config.get("APP_URL_WEBHOOK").format("/webhook"),
         allowed_updates=dp.resolve_used_update_types(),
         drop_pending_updates=True
     )
-    async with engine.begin() as connection:
-        await connection.run_sync(metadata.create_all)
-        await connection.commit()
-    # asyncio.create_task(parse_gc(engine))
+    asyncio.create_task(parse_gc(engine))
     yield
     await bot.delete_webhook()
     await bot.session.close()
@@ -60,6 +61,7 @@ async def lifespan(app: FastAPI):
 def create_app():
     config = Config('../.env')
     engine = create_async_engine(config.get("DB_URL"), echo=True)
+    print(config.get("DB_URL"))
     bot = create_bot(config)
     bot_container = create_bot_container(config, engine)
     dp = create_dispatcher(bot_container)

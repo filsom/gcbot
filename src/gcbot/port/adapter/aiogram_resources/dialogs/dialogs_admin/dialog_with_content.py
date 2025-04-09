@@ -8,7 +8,7 @@ from dishka.integrations.aiogram_dialog import inject
 from gcbot.application.admin_service import AdminService
 from gcbot.domain.model.content import Media
 from gcbot.port.adapter.aiogram_resources.dialogs.dialog_state import ContentDialog
-from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.dialog_state import AddVoiceDialog, NewTrainingDialog
+from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.dialog_state import AddVoiceDialog, CategoryDialog, NewTrainingDialog
 from gcbot.port.adapter.aiogram_resources.dialogs.widgets import BackAdminPanel
 
 
@@ -58,12 +58,11 @@ content_dialog = Dialog(
                 id="add_new_workout",
                 on_click=on_add_training,
             ),
-            # kbd.Start(
-            #     text.Const("Добавить категорию"),
-            #     id="add_category",
-            #     state=AddCategoryDialog.start,
-            #     show_mode=ShowMode.EDIT,
-            # ),
+            kbd.Start(
+                text.Const("Категории"),
+                id="category",
+                state=CategoryDialog.start,
+            ),
             kbd.Start(
                 text.Const("Установить Voice"),
                 id="set_voice_message",

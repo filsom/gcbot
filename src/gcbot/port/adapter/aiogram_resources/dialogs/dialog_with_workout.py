@@ -29,7 +29,7 @@ async def on_click_category_name(
     dialog_manager: DialogManager,
     item_id,
 ):
-    dialog_manager.dialog_data["category_id"] = item_id
+    dialog_manager.dialog_data["category_id"] = str(item_id)
     await dialog_manager.next()
 
 
@@ -168,7 +168,7 @@ workout_dialog = Dialog(
             text.Const("Выберите категорию 👇🏻", when=~F["text"]),
             text.Format("{text}", when=F["text"])
         ),
-        kbd.Column(
+        kbd.Group(
             kbd.Select(
                 id="selected_categories",
                 text=text.Format("{item[0]}"),
@@ -176,6 +176,7 @@ workout_dialog = Dialog(
                 item_id_getter=operator.itemgetter(1),
                 on_click=on_click_category_name
             ),
+            width=2
         ),
         kbd.Back(
             text.Const("⬅️ К разделам"),

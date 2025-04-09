@@ -20,6 +20,13 @@ class Ingredient:
 
 @dataclass
 class Recipe:
+    TRANSlATION_MAP = {
+        TypeMeal.BREAKFAST: "Завтрак",
+        TypeMeal.LUNCH: "Обед",
+        TypeMeal.DINNER: "Ужин",
+        TypeMeal.SNACK: "Перекус"
+    }
+
     recipe_id: int
     name: str
     text: str
@@ -55,18 +62,12 @@ class Recipe:
         )
 
     def partial_repr(self) -> str:
-        TRANSlATION_MAP = {
-            TypeMeal.BREAKFAST: "Завтрак",
-            TypeMeal.LUNCH: "Обед",
-            TypeMeal.DINNER: "Ужин",
-            TypeMeal.SNACK: "Перекус"
-        }
         text = ""
         for ingredient in self.ingredients:
-            text += f"- {ingredient.name.title()} <b>{ingredient.value}{ingredient.unit}</b>\n"
+            text += f"- {ingredient.name.capitalize()} <b>{ingredient.value}{ingredient.unit}</b>\n"
         return (
-            f"<b>Прием пищи:</b> {TRANSlATION_MAP.get(self.type_meal)}\n"
-            f"<b>Название рецепта:</b> {self.name.title()}\n\n"
+            f"<b>Название рецепта:</b> {self.name.capitalize()}\n\n"
+            f"<b>Прием пищи:</b> {self.TRANSlATION_MAP.get(self.type_meal)}\n"
             f"<b>Ингредиенты:</b> \n{text}\n"
         )
     
@@ -83,8 +84,8 @@ class Recipe:
         )
         html = (
             f"<p><b>Ссылка:</b> <a href='{url}'>{url}</a></p>"
-            f"<p><b>Прием пищи:</b> {self.type_meal}</p>"
             f"<p><b>Название рецепта:</b> {self.name}</p>"
+            f"<p><b>Прием пищи:</b> {self.TRANSlATION_MAP.get(self.type_meal)}</p>"
             f"<p><b>Ингредиенты:</b></p>"
             f"<ul>{ingredients_html}</ul>"
         )

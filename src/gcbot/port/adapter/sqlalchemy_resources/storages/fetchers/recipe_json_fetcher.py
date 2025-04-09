@@ -46,8 +46,8 @@ class RecipeJsonFetcher:
         )
         result = (await self.connection.execute(query)).scalar()
         result["view_text"] = (
-            f"<b>Прием пищи: </b>{result["type_meal"].title()}\n"
-            f"<b>Название рецепта: </b>{result["name"]}\n\n"
+            f"<b>Название рецепта: </b>{result["name"]}\n"
+            f"<b>Прием пищи: </b>{result["type_meal"].title()}\n\n"
             f"<b>Ингредиенты:</b>\n{result["text_ingredients"]}\n"
         )
         return result

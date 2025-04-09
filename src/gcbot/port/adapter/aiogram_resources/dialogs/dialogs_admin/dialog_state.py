@@ -26,3 +26,16 @@ class UploadMediaDialog(StatesGroup):
 class NewTrainingDialog(StatesGroup):
     start = State()
     send = State()
+
+
+class AddCategoryDialog(StatesGroup):
+    start = State()
+    confirm = State()
+
+
+class DeleteCategoryDialog(StatesGroup):
+    start = State()
+
+
+class CategoryDialog(StatesGroup):
+    start = State()

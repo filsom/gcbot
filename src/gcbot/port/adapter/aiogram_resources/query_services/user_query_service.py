@@ -56,6 +56,7 @@ class UserQueryService:
     async def query_confirm_email_address(self, user_id: int) -> dict:
         user_data = await self.user_fetcher \
             .fetch_user_and_groups_with_id(user_id)
+        print(user_data)
         if user_data["groups"]:
             if Group.ADMIN in user_data["groups"]:
                 user_data.update({"dialog_state": AdminStartingDialog.start})
@@ -64,6 +65,7 @@ class UserQueryService:
         else:
             last_workout = await self.workout_fetcher \
                 .fetch_last_workout()
+            print(last_workout)
             user_data.update({"dialog_state": FreeStartingDialog.start})
             user_data.update({"workout": last_workout})
         return user_data

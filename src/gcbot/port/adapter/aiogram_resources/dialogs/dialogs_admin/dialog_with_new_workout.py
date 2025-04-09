@@ -1,4 +1,6 @@
+import asyncio
 import operator
+from uuid import UUID
 
 from aiogram import types as t
 from aiogram_dialog import Dialog, DialogManager, ShowMode, StartMode, Window
@@ -24,7 +26,7 @@ async def on_click_category_name(
     dialog_manager: DialogManager,
     item_id,
 ):
-    dialog_manager.dialog_data["category_id"] = item_id
+    dialog_manager.dialog_data["category_id"] = str(item_id)
     dialog_manager.dialog_data["user_id"] = callback.from_user.id
     await dialog_manager.start(
         UploadMediaDialog.start,
@@ -61,7 +63,7 @@ async def on_click_free_mailing(
 
 
 @inject
-async def process_result_add_training(
+async def process_result_add_workout(
     start_data,
     result,
     dialog_manager: DialogManager,
@@ -71,7 +73,7 @@ async def process_result_add_training(
         dialog_manager.dialog_data["media"] = result["media"]
         dialog_manager.dialog_data["inpute_text_media"] = result["inpute_text_media"]
         await service.add_new_workout(
-            dialog_manager.dialog_data["category_id"],
+            UUID(dialog_manager.dialog_data["category_id"]),
             result["inpute_text_media"],
             result["media"]
         )
@@ -83,7 +85,7 @@ new_workout_dialog = Dialog(
         text.Const("Выберите категорию тренировки!"),
         kbd.Column(
             kbd.Select(
-                id='id_name_category',
+                id='id_name_category_1',
                 text=text.Format("{item[0]}"),
                 items="categories",
                 item_id_getter=operator.itemgetter(1),
@@ -93,7 +95,7 @@ new_workout_dialog = Dialog(
         kbd.Cancel(text.Const("⬅️ В Админ панель"), id="to_main"),
         state=NewTrainingDialog.start,
         getter=get_categories_name,
-        on_process_result=process_result_add_training
+        on_process_result=process_result_add_workout
     ),
     Window(
         text.Const(
@@ -102,7 +104,7 @@ new_workout_dialog = Dialog(
         kbd.Row(
             kbd.Button(
                 text.Const("Да"),
-                id="yes_mailing",
+                id="yes_mailing_1",
                 on_click=on_click_free_mailing
             ),
             kbd.Cancel(text.Const("Нет"))

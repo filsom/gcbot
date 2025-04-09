@@ -162,3 +162,5 @@ cython_debug/
 ngrok.yml
 .vscode
 credentials.json
+pgdata
+redisdata

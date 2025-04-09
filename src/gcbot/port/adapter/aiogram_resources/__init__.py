@@ -20,6 +20,7 @@ from .dialogs.dialogs_admin.dialog_with_users_groups import (
 from .dialogs.dialogs_admin.mailing.dialog_with_send_mailing import send_mailings_dialog
 from .dialogs.dialogs_admin.mailing.dialog_with_mailings import mailing_dialog
 from .dialogs.dialogs_admin.mailing.dialog_with_planed_mailing import planed_mailling_dialog
+from .dialogs.dialogs_admin.dialog_with_category import category_dialog, delete_category_dialog, add_new_category_dialog
 
 
 starting_router.include_router(anon_starting_dialog)
@@ -40,3 +41,6 @@ starting_router.include_router(upload_media_dialog)
 starting_router.include_router(send_mailings_dialog)
 starting_router.include_router(mailing_dialog)
 starting_router.include_router(planed_mailling_dialog)
+starting_router.include_router(category_dialog)
+starting_router.include_router(delete_category_dialog)
+starting_router.include_router(add_new_category_dialog)
