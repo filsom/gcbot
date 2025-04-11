@@ -66,8 +66,8 @@ class Recipe:
         for ingredient in self.ingredients:
             text += f"- {ingredient.name.capitalize()} <b>{ingredient.value}{ingredient.unit}</b>\n"
         return (
-            f"<b>Название рецепта:</b> {self.name.capitalize()}\n\n"
-            f"<b>Прием пищи:</b> {self.TRANSlATION_MAP.get(self.type_meal)}\n"
+            f"<b>Название рецепта:</b> {self.name.capitalize()}\n"
+            f"<b>Прием пищи:</b> {self.TRANSlATION_MAP.get(self.type_meal)}\n\n"
             f"<b>Ингредиенты:</b> \n{text}\n"
         )
     

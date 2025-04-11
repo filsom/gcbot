@@ -75,8 +75,11 @@ async def selected_coefficient(
     query_service: FromDishka[UserQueryService]
 ):
     if item_id == "1":
-        file_id = await query_service.query_video_note()
-        await callback.message.answer_video_note(file_id)
+        file_id = await query_service.query_message_voice()
+        if file_id is not None:
+            await callback.message.answer_video_note(file_id)
+        else:
+            await callback.message.answer("Голосовое сообщение не найдено 🤷🏻")
         dialog_manager.show_mode = ShowMode.DELETE_AND_SEND
     else:
         dialog_manager.dialog_data["coefficient"] = item_id

@@ -44,7 +44,7 @@ admin_starting_dialog = Dialog(
                 id="mailling",
                 state=MaillingDialog.start,
                 show_mode=ShowMode.EDIT,
-                data={}
+                # data={}
             ),
             kbd.Start(
                 text.Const("Разделы"),

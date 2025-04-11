@@ -26,10 +26,14 @@ async def on_click_send_now_mailing(
     dialog_manager.show_mode = ShowMode.DELETE_AND_SEND
     bot: Bot = dialog_manager.middleware_data["bot"]
     mailing_id = uuid4()
+    if isinstance(dialog_manager.start_data["inpute_text_media"], list):
+        text = dialog_manager.start_data["inpute_text_media"][0]
+    else:
+        text = dialog_manager.start_data["inpute_text_media"]
     await storage.add_new_mailing(
         mailing_id,
         None,
-        dialog_manager.start_data["inpute_text_media"][0],
+        text,
         dialog_manager.start_data["media"],
         int(dialog_manager.start_data["type_recipient"]),
         StatusMailing.AWAIT
@@ -69,10 +73,14 @@ async def input_name_mailing_handler(
             message.text.lower()
         )
     else:
+        if isinstance(dialog_manager.start_data["inpute_text_media"], list):
+            text = dialog_manager.start_data["inpute_text_media"][0]
+        else:
+            text = dialog_manager.start_data["inpute_text_media"]
         await service.add_planed_mailing(
             uuid4(),
             message.text.lower(),
-            dialog_manager.start_data["inpute_text_media"][0],
+            text,
             dialog_manager.start_data["media"],
             int(dialog_manager.start_data["type_recipient"]),
             StatusMailing.AWAIT

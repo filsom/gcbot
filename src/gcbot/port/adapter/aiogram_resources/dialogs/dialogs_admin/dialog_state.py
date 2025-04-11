@@ -39,3 +39,7 @@ class DeleteCategoryDialog(StatesGroup):
 
 class CategoryDialog(StatesGroup):
     start = State()
+
+
+class SendMessageDialog(StatesGroup):
+    start = State()

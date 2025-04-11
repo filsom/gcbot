@@ -21,7 +21,7 @@ class WorkoutQueryService:
                 .fetch_favorites_categories_names(user_id)
         else:
             return await self.workout_fetcher \
-                .fetch_all_categories_names()
+                .fetch_not_empty_categories_names()
         
     async def query_workout(
         self,

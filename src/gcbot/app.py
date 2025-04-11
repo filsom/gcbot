@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
     await bot.set_webhook(
         config.get("APP_URL_WEBHOOK").format("/webhook"),
         allowed_updates=dp.resolve_used_update_types(),
-        drop_pending_updates=True
+        drop_pending_updates=False
     )
     asyncio.create_task(parse_gc(engine))
     yield
@@ -60,7 +60,7 @@ async def lifespan(app: FastAPI):
 
 def create_app():
     config = Config('../.env')
-    engine = create_async_engine(config.get("DB_URL"), echo=True)
+    engine = create_async_engine(config.get("DB_URL"), echo=False)
     print(config.get("DB_URL"))
     bot = create_bot(config)
     bot_container = create_bot_container(config, engine)
@@ -80,4 +80,6 @@ def create_app():
     setup_dishka(app_container, app)
     return app
 
-app = create_app()
+
+if __name__ == "__main__":
+    uvicorn.run(create_app(), port=8000, lifespan="on")

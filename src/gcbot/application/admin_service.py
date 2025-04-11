@@ -8,6 +8,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from gcbot.domain.model.content import Media
 from gcbot.domain.model.day_menu import parse_recipe
+from gcbot.domain.model.history_message import HistoryMessage
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.message_storage import MessageStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.recipe_storage import RecipeStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.user_storage import UserStorage
 from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_storage import WorkoutStorage
@@ -21,13 +23,15 @@ class AdminService:
         worksheet: Worksheet,
         user_storage: UserStorage,
         recipe_storage: RecipeStorage,
-        workout_storage: WorkoutStorage
+        workout_storage: WorkoutStorage,
+        message_storage: MessageStorage,
     ):
         self.connection = connection
         self.worksheet = worksheet
         self.user_storage = user_storage
         self.recipe_storage = recipe_storage
         self.workout_storage = workout_storage
+        self.message_storage = message_storage
 
     async def add_user_in_group(self, email: str, group_id: int) -> None:
         async with self.connection.begin():
@@ -50,7 +54,6 @@ class AdminService:
     async def unload_from_google_sheet(self) -> None:
         async with self.connection.begin():
             head = await self.recipe_storage.count()
-            print(head)
             records = self.worksheet.get_all_records()[head:]
             if records:
                 unload_recipes = []
@@ -91,4 +94,10 @@ class AdminService:
     async def delete_category(self, category_id: UUID):
         async with self.connection.begin():
             await self.workout_storage.delete_category(category_id)
+            await self.connection.commit()
+
+
+    async def add_history_message(self, message: HistoryMessage):
+        async with self.connection.begin():
+            await self.message_storage.add_message(message)
             await self.connection.commit()

@@ -56,7 +56,6 @@ class UserQueryService:
     async def query_confirm_email_address(self, user_id: int) -> dict:
         user_data = await self.user_fetcher \
             .fetch_user_and_groups_with_id(user_id)
-        print(user_data)
         if user_data["groups"]:
             if Group.ADMIN in user_data["groups"]:
                 user_data.update({"dialog_state": AdminStartingDialog.start})
@@ -190,10 +189,10 @@ class UserQueryService:
         }) 
         return user_data
     
-    async def query_video_note(self) -> str:
+    async def query_message_voice(self) -> str:
         query = (
             sa.select(medias_table.c.file_id)
-            .where(medias_table.c.content_type == "video_note")
+            .where(medias_table.c.content_type == "voice")
             .order_by(sa.desc(medias_table.c.message_id))
             .limit(1)
         )

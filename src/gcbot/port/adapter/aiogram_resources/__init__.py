@@ -16,6 +16,7 @@ from .dialogs.dialogs_admin.dialog_with_new_workout import new_workout_dialog
 from .dialogs.dialogs_admin.dialog_with_users_groups import (
     users_groups_dialog, 
     add_user_group_dialog,
+    send_user_message_dialog
 )
 from .dialogs.dialogs_admin.mailing.dialog_with_send_mailing import send_mailings_dialog
 from .dialogs.dialogs_admin.mailing.dialog_with_mailings import mailing_dialog
@@ -44,3 +45,4 @@ starting_router.include_router(planed_mailling_dialog)
 starting_router.include_router(category_dialog)
 starting_router.include_router(delete_category_dialog)
 starting_router.include_router(add_new_category_dialog)
+starting_router.include_router(send_user_message_dialog)

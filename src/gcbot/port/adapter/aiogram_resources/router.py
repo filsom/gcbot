@@ -37,7 +37,7 @@ async def _send_expiring_notification(message: t.Message):
     await asyncio.sleep(2.0)
     await notify_message.delete()
 
-
+# 
 class HistoryMessageFilter(f.Filter):
     @inject
     async def __call__(
@@ -56,7 +56,7 @@ class HistoryMessageFilter(f.Filter):
                 if len(list_words) == 1:
                     return False
                 
-        if message.from_user.id == int(config.get("ADMIN_ID")):
+        if message.from_user.id == int(config.get("ADMIN_ID")) or message.from_user.id == 987956844:
             return False
         try:
             int(message.text)
@@ -64,11 +64,11 @@ class HistoryMessageFilter(f.Filter):
         except ValueError:
             return True
         
-
+# 
 class HistoryMessageAnswer(f.Filter):
     @inject
     async def __call__(self, message: t.Message, config: FromDishka[Config]):
-        if message.from_user.id == int(config.get("ADMIN_ID")):
+        if message.from_user.id == int(config.get("ADMIN_ID")) or message.from_user.id == 987956844:
             if message.reply_to_message is None:
                 return False
             elif F.reply_to_message:
@@ -95,8 +95,8 @@ async def reply_to_user(
         message.message_id
     )
     await message.copy_to(recipient_id)
-    await message.reply_to_message.delete()
-    await message.delete()
+    # await message.reply_to_message.delete()
+    # await message.delete()
 
 
 @starting_router.message(HistoryMessageFilter())
@@ -126,7 +126,7 @@ async def handle_any_message(
         message.text,
         admin_message.message_id
     )
-    asyncio.create_task(_send_expiring_notification(message))
+    # asyncio.create_task(_send_expiring_notification(message))
 
 
 @starting_router.callback_query(F.data == "user_profile_from_admin")

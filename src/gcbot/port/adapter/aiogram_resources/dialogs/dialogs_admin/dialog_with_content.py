@@ -92,10 +92,10 @@ async def voice_handler(
 ):
     await service.set_support_voice(
         Media(
-            message.video_note.file_id,
-            message.video_note.file_unique_id,
+            message.voice.file_id,
+            message.voice.file_unique_id,
             message.message_id,
-            ContentType.VIDEO_NOTE
+            ContentType.VOICE
         )
     )
     await message.answer(f"Успешно добавлено ✅")
@@ -106,10 +106,10 @@ async def voice_handler(
 
 set_voice_dialog = Dialog(
     Window(
-        text.Const("Загрузите видеосообщение"),
+        text.Const("Загрузите голосовое сообщение"),
         input.MessageInput(
             voice_handler,
-            content_types=ContentType.VIDEO_NOTE
+            content_types=ContentType.VOICE
         ),
         BackAdminPanel(),
         state=AddVoiceDialog.start

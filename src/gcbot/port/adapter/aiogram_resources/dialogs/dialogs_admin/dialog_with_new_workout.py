@@ -1,4 +1,3 @@
-import asyncio
 import operator
 from uuid import UUID
 
@@ -15,9 +14,7 @@ from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.dialog_state imp
 )
 from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.mailing.dialog_state import SendMailingDialog
 from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.mailing.mailing import RecipientMailing
-from gcbot.port.adapter.aiogram_resources.query_services.workout_query_service import (
-    WorkoutQueryService
-)
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.workout_json_fetcher import WorkoutJsonFetcher
 
 
 async def on_click_category_name(
@@ -38,10 +35,10 @@ async def on_click_category_name(
 @inject
 async def get_categories_name(
     dialog_manager: DialogManager, 
-    service: FromDishka[WorkoutQueryService], 
+    service: FromDishka[WorkoutJsonFetcher], 
     **kwargs
 ):
-    return await service.query_categories_names()
+    return await service.fetch_all_categories_names()
 
 
 async def on_click_free_mailing(

@@ -65,7 +65,7 @@ async def on_click_select_recipe(
     message = await bot.send_message(callback.from_user.id, like_recipe["view_text"])
     dialog_manager.start_data["dirty_photos"].append(message_photo.message_id)
     dialog_manager.start_data["recipes"].update({
-        like_recipe["recipe_id"]: message.message_id,
+        str(like_recipe["recipe_id"]): message.message_id,
     })
     dialog_manager.show_mode = ShowMode.DELETE_AND_SEND
     if not dialog_manager.start_data["type_meal"]:
@@ -81,7 +81,7 @@ async def on_click_select_recipe(
             )
         )
         for recipe_id in day_menu:
-            message_id = dialog_manager.start_data["recipes"].get(recipe_id)
+            message_id = dialog_manager.start_data["recipes"].get(str(recipe_id))
             if message_id is not None:
                 await bot.edit_message_text(
                     day_menu[recipe_id],
@@ -116,7 +116,7 @@ async def on_click_my_snack(
         )
     )
     for recipe_id in day_menu:
-        message_id = dialog_manager.start_data["recipes"].get(recipe_id)
+        message_id = dialog_manager.start_data["recipes"].get(str(recipe_id))
         if message_id is not None:
             await bot.edit_message_text(
                 day_menu[recipe_id],

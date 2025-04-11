@@ -1,14 +1,17 @@
+from datetime import datetime
 import operator
 
-from aiogram import F, types as t
+from aiogram import F, Bot, types as t
 from aiogram_dialog import Dialog, DialogManager, ShowMode, Window
 from aiogram_dialog.widgets import text, input, kbd
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 
 from gcbot.application.admin_service import AdminService
+from gcbot.domain.model.history_message import HistoryMessage
 from gcbot.port.adapter.aiogram_resources.dialogs.dialogs_admin.dialog_state import (
-    AddUserInGroupDialog, 
+    AddUserInGroupDialog,
+    SendMessageDialog, 
     UsersGroupsDialog
 )
 from gcbot.port.adapter.aiogram_resources.dialogs.widgets import (
@@ -17,6 +20,7 @@ from gcbot.port.adapter.aiogram_resources.dialogs.widgets import (
     input_email_address_handler, 
 )
 from gcbot.port.adapter.aiogram_resources.query_services.user_query_service import UserQueryService
+from gcbot.port.adapter.sqlalchemy_resources.storages.fetchers.message_storage import MessageStorage
 
 
 @inject
@@ -36,6 +40,7 @@ async def get_user_data_for_admin(
                 dialog_manager.start_data["user_id"]
             )
     dialog_manager.dialog_data.update(**query_result)
+    print(query_result)
     return query_result
 
 
@@ -110,6 +115,20 @@ async def on_click_close_profile_from_message(
     await callback.message.delete()
 
 
+async def on_click_send_message_from_user(
+    callback: t.CallbackQuery,
+    button,
+    dialog_manager: DialogManager,
+):  
+    await dialog_manager.start(
+        state=SendMessageDialog.start,
+        data={
+            "user_id": dialog_manager.dialog_data["user_id"],
+        },
+        show_mode=ShowMode.EDIT,
+    )
+
+
 users_groups_dialog = Dialog(
     Window(
         text.Const("Введите @email пользователя 🔎"),
@@ -144,6 +163,12 @@ users_groups_dialog = Dialog(
             text.Const("Изменить @email"),
             id="change_user_email_address",
             on_click=kbd.Next(),
+            when=F["user_id"]
+        ),
+        kbd.Button(
+            text.Const("Отправить сообщение"),
+            id="send_user_message",
+            on_click=on_click_send_message_from_user,
             when=F["user_id"]
         ),
         kbd.Button(
@@ -201,5 +226,38 @@ add_user_group_dialog = Dialog(
         BackAdminPanel(),
         state=AddUserInGroupDialog.start,
         getter=get_user_groups
+    )
+)
+
+
+@inject
+async def message_handler(
+    message: t.Message,
+    message_input,
+    dialog_manager: DialogManager,
+    service: FromDishka[AdminService]
+):
+    bot: Bot = dialog_manager.middleware_data["bot"]
+    await bot.send_message(
+        dialog_manager.start_data["user_id"],
+        message.text
+    )
+    await service.add_history_message(
+        HistoryMessage(
+            message.from_user.id,
+            dialog_manager.start_data["user_id"],
+            message.text,
+            datetime.now()
+        )
+    )
+    await dialog_manager.done()
+
+
+send_user_message_dialog = Dialog(
+    Window(
+        text.Const("Введите текст сообщения"),
+        input.MessageInput(message_handler),
+        BackAdminPanel(),
+        state=SendMessageDialog.start
     )
 )

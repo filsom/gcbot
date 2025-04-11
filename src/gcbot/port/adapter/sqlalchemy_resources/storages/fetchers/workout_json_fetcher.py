@@ -60,6 +60,23 @@ class WorkoutJsonFetcher:
             name_categories.append(row)
         return {"categories": name_categories}
     
+    async def fetch_not_empty_categories_names(self):
+        query = (
+            sa.select(
+                categories_table.c.name, 
+                sa.cast(categories_table.c.category_id, sa.String)
+            )
+            .where(sa.exists(
+                sa.select(1)
+                .where(workouts_table.c.category_id == categories_table.c.category_id)
+            ))
+        )
+        rows = await self.connection.execute(query)
+        name_categories = []
+        for row in rows:
+            name_categories.append(row)
+        return {"categories": name_categories}
+    
     async def fetch_last_workout(self) -> dict:
         query = (
             self._select_json_workout()

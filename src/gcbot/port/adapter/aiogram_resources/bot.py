@@ -34,7 +34,10 @@ def create_bot(config: Config):
     return Bot(
         config.get("BOT_TOKEN"),
         session=session,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+        default=DefaultBotProperties(
+            parse_mode=ParseMode.HTML, 
+            protect_content=True
+        ),
     )
 
 
@@ -54,7 +57,8 @@ def create_bot_container(
 
 
 def create_dispatcher(container: AsyncContainer):
-    storage = RedisStorage.from_url("redis://somov:somov228@localhost:6380/0")
+    # storage = MemoryStorage()
+    storage = RedisStorage.from_url("redis://localhost:6379")
     storage.key_builder = DefaultKeyBuilder(with_destiny=True)
     dp = Dispatcher(
         storage=storage, 
