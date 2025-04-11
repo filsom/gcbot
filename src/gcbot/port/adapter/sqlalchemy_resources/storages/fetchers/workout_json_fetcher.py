@@ -131,7 +131,6 @@ class WorkoutJsonFetcher:
         return result
     
     def _select_workout(self, category_id: UUID, user_id: int, isouter=False):
-        print(user_id, "r")
         liked = (
             sa.select(
                 like_workouts_table.c.workout_id.label("workout_id")
